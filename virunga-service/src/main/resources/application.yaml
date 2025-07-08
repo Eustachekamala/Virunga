@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/virungaDB
     username: postgres
-    password: 09200The
+    password: 092000The
     driver-class-name: org.postgresql.Driver
 
   jpa:
