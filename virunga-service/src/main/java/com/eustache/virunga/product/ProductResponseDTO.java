@@ -1,7 +1,7 @@
 package com.eustache.virunga.product;
 
 import com.eustache.virunga.product.model.Status;
-import com.eustache.virunga.product.model.Type_Product;
+import com.eustache.virunga.product.model.Type;
 
 import java.util.Date;
 
@@ -10,7 +10,7 @@ public record ProductResponseDTO(
         String name,
         int quantity,
         Status status,
-        Type_Product typeProduct,
+        Type type,
         String description,
         Date createdAt,
         Date updatedAt,

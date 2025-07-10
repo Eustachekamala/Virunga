@@ -12,7 +12,7 @@ public class ProductMapper {
                 product.getName(),
                 product.getQuantity(),
                 product.getStatus(),
-                product.getType(),
+                product.getTypeProduct(),
                 product.getDescription(),
                 product.getCreatedAt(),
                 product.getUpdatedAt(),
@@ -26,7 +26,7 @@ public class ProductMapper {
         product.setName(productDTO.name());
         product.setQuantity(productDTO.quantity());
         product.setStatus(productDTO.status());
-        product.setType(productDTO.typeProduct());
+        product.setTypeProduct(productDTO.typeProduct());
         product.setCreatedAt(productDTO.createdAt());
         product.setUpdatedAt(productDTO.updatedAt());
         return product;

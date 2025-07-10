@@ -16,7 +16,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private Status status;
     @Enumerated(EnumType.STRING)
-    private Type_Product type;
+    private Type typeProduct;
     @Column(nullable = true)
     private String description;
     private Date createdAt;

@@ -1,6 +1,7 @@
 package com.eustache.virunga.product;
 
 import com.eustache.virunga.product.model.Product;
+import com.eustache.virunga.product.model.Type;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -40,7 +41,7 @@ public class ProductServiceImpl implements ProductService {
             existingProduct.setName(productDTO.name());
             existingProduct.setQuantity(productDTO.quantity());
             existingProduct.setStatus(productDTO.status());
-            existingProduct.setType(productDTO.typeProduct());
+            existingProduct.setTypeProduct(productDTO.typeProduct());
             existingProduct.setUpdatedAt(productDTO.updatedAt());
             existingProduct = productDAO.save(existingProduct);
             log.info("Product updated: {}", existingProduct);
@@ -110,11 +111,33 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<List<ProductResponseDTO>> getProductByConsumable(String consumable) {
-        return null;
+        try{
+            return new ResponseEntity<>(
+                    productDAO.findProductByTypeProduct(Type.valueOf(consumable))
+                            .stream()
+                            .map(productMapper::toDto)
+                            .collect(Collectors.toList()),
+                    HttpStatus.OK
+            );
+        }catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<List<ProductResponseDTO>> getProductByNoConsumable(String noConsumable) {
-        return null;
+        try{
+            return new ResponseEntity<>(
+                    productDAO.findProductByTypeProduct(Type.valueOf(noConsumable))
+                            .stream()
+                            .map(productMapper::toDto)
+                            .collect(Collectors.toList()),
+                    HttpStatus.OK
+            );
+        }catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
     }
 }

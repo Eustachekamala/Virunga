@@ -1,6 +1,6 @@
 package com.eustache.virunga.product.model;
 
-public enum Type_Product {
+public enum Type {
     CONSUMABLE,
     NON_CONSUMABLE,
 }
