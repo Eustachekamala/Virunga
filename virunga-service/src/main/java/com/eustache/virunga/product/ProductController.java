@@ -18,4 +18,25 @@ public class ProductController {
     public ResponseEntity<List<ProductResponseDTO>> getAll() {
         return productService.getAllProducts();
     }
+
+    @PostMapping
+    public ResponseEntity<String> createProduct(
+            @RequestBody ProductDTO  productDTO
+    ){
+        return productService.createProduct(productDTO);
+    }
+
+    @GetMapping("type/{consumable}")
+    public ResponseEntity<List<ProductResponseDTO>> getAllByTypeConsumable(
+            @PathVariable String consumable
+    ) {
+        return productService.getProductByConsumable(consumable);
+    }
+
+    @GetMapping("/type/{nonConsumable}")
+    public ResponseEntity<List<ProductResponseDTO>> getAllByTypeConConsumable(
+            @PathVariable String nonConsumable
+    ){
+        return productService.getProductByConsumable(nonConsumable);
+    }
 }
