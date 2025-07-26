@@ -10,7 +10,7 @@ import java.util.List;
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 public class ProductController {
-    private final ProductServiceImpl  productService;
+    private final ProductServiceImpl productService;
 
     @GetMapping("allProducts")
     public ResponseEntity<List<ProductResponseDTO>> getAll() {
@@ -31,10 +31,32 @@ public class ProductController {
         return productService.getProductByConsumable(consumable);
     }
 
-    @GetMapping("/type/{nonConsumable}")
+    @GetMapping("type/{nonConsumable}")
     public ResponseEntity<List<ProductResponseDTO>> getAllByTypeConConsumable(
             @PathVariable String nonConsumable
     ){
         return productService.getProductByConsumable(nonConsumable);
+    }
+
+    @PatchMapping("update/{id}")
+    public ResponseEntity<String> updateProduct(
+            @PathVariable Integer id,
+            @RequestBody ProductDTO  productDTO
+    ){
+        return productService.updateProduct(id, productDTO);
+    }
+
+    @GetMapping("get/{name}")
+    public ResponseEntity<List<ProductResponseDTO>> getProductByName(
+            @PathVariable String name
+    ){
+        return productService.getProductByName(name);
+    }
+
+    @GetMapping("get/{id}")
+    public ResponseEntity<ProductResponseDTO> getProductById(
+            @PathVariable Integer id
+    ){
+        return productService.getProductById(id);
     }
 }
