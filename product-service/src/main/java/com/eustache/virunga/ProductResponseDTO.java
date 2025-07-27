@@ -1,19 +1,19 @@
 package com.eustache.virunga;
 
 import com.eustache.virunga.model.Status;
-import com.eustache.virunga.model.Type;
+import com.eustache.virunga.model.TypeProduct;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public record ProductResponseDTO(
         Integer id,
         String name,
         int quantity,
         Status status,
-        Type type,
+        TypeProduct typeProduct,
         String description,
-        Date createdAt,
-        Date updatedAt,
+        LocalDate createdAt,
+        LocalDate updatedAt,
         String image
 ) {
 }

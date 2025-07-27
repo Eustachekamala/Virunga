@@ -1,7 +1,7 @@
 package com.eustache.virunga;
 
 import com.eustache.virunga.model.Product;
-import com.eustache.virunga.model.Type;
+import com.eustache.virunga.model.TypeProduct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -113,7 +113,7 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<List<ProductResponseDTO>> getProductByConsumable(String consumable) {
         try{
             return new ResponseEntity<>(
-                    productDAO.findProductByTypeProduct(Type.valueOf(consumable))
+                    productDAO.findProductByTypeProduct(TypeProduct.valueOf(consumable))
                             .stream()
                             .map(productMapper::toDto)
                             .collect(Collectors.toList()),
@@ -129,7 +129,7 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<List<ProductResponseDTO>> getProductByNoConsumable(String noConsumable) {
         try{
             return new ResponseEntity<>(
-                    productDAO.findProductByTypeProduct(Type.valueOf(noConsumable))
+                    productDAO.findProductByTypeProduct(TypeProduct.valueOf(noConsumable))
                             .stream()
                             .map(productMapper::toDto)
                             .collect(Collectors.toList()),

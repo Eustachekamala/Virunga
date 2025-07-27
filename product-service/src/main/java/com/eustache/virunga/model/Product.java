@@ -2,8 +2,10 @@ package com.eustache.virunga.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -16,11 +18,15 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private Status status;
     @Enumerated(EnumType.STRING)
-    private Type typeProduct;
+    private TypeProduct typeProduct;
+    @Enumerated(EnumType.STRING)
+    private Category category;
     @Column(nullable = true)
     private String description;
-    private Date createdAt;
-    private Date updatedAt;
+    @CreationTimestamp
+    private LocalDate createdAt;
+    @UpdateTimestamp
+    private LocalDate updatedAt;
     @Column(nullable = true)
     private String image;
 }
