@@ -1,0 +1,21 @@
+services:
+  db:
+    container_name: virunga-product-service
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: productVirungaDB
+      POSTGRES_USER: ${USERNAME}
+      POSTGRES_PASSWORD: ${PASSWORD}
+      PGDATA: /data/postgres
+    volumes:
+      - db:/data/postgres
+    ports:
+      - "5434:5432"
+    networks:
+      - db
+    restart: unless-stopped
+networks:
+  db:
+    driver: bridge
+volumes:
+  db:
