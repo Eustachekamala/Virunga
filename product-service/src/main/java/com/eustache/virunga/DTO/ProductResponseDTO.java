@@ -1,4 +1,4 @@
-package com.eustache.virunga;
+package com.eustache.virunga.DTO;
 
 import com.eustache.virunga.model.Status;
 import com.eustache.virunga.model.TypeProduct;
@@ -14,6 +14,6 @@ public record ProductResponseDTO(
         String description,
         LocalDate createdAt,
         LocalDate updatedAt,
-        String image
+        String imagePath
 ) {
 }

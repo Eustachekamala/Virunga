@@ -1,5 +1,7 @@
 package com.eustache.virunga;
 
+import com.eustache.virunga.DTO.ProductDTO;
+import com.eustache.virunga.DTO.ProductResponseDTO;
 import com.eustache.virunga.model.Product;
 import com.eustache.virunga.model.TypeProduct;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<String> createProduct(ProductDTO productDTO) {
         try {
+            // Path of the uploaded file
+//            String uploadDir = "resources/uploads/images/";
+//            String fileName = UUID.randomUUID() +"_"+file.getOriginalFilename();
+//            Path filePath = Paths.get(uploadDir + fileName);
+//            Files.createDirectories(filePath.getParent());
+//            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            //Use filePath.toString() as image path in the mapper
             Product product = productMapper.toEntity(productDTO);
             product = productDAO.save(product);
             log.info("Product created: {}", product);
@@ -29,8 +38,8 @@ public class ProductServiceImpl implements ProductService {
 
         }catch (Exception ex) {
             log.error(ex.getMessage(), ex);
+            return new ResponseEntity<>("Product creation failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("Product not created", HttpStatus.BAD_REQUEST);
     }
 
     @Override

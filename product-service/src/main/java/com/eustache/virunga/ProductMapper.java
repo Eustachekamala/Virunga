@@ -1,5 +1,7 @@
 package com.eustache.virunga;
 
+import com.eustache.virunga.DTO.ProductDTO;
+import com.eustache.virunga.DTO.ProductResponseDTO;
 import com.eustache.virunga.model.Product;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +18,7 @@ public class ProductMapper {
                 product.getDescription(),
                 product.getCreatedAt(),
                 product.getUpdatedAt(),
-                product.getImage()
+                product.getImagePath()
         );
     }
 
@@ -26,6 +28,8 @@ public class ProductMapper {
         product.setName(productDTO.name());
         product.setQuantity(productDTO.quantity());
         product.setStatus(productDTO.status());
+        product.setCategory(productDTO.category());
+        product.setImagePath(productDTO.imagePath());
         product.setTypeProduct(productDTO.typeProduct());
         product.setCreatedAt(productDTO.createdAt());
         product.setUpdatedAt(productDTO.updatedAt());

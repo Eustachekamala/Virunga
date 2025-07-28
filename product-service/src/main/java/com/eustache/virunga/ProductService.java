@@ -1,5 +1,7 @@
 package com.eustache.virunga;
 
+import com.eustache.virunga.DTO.ProductDTO;
+import com.eustache.virunga.DTO.ProductResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 

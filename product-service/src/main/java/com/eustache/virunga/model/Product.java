@@ -28,6 +28,6 @@ public class Product {
     @UpdateTimestamp
     private LocalDate updatedAt;
     @Column(nullable = true)
-    private String image;
+    private String imagePath;
 }
 

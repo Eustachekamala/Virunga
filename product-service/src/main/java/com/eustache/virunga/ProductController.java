@@ -1,5 +1,7 @@
 package com.eustache.virunga;
 
+import com.eustache.virunga.DTO.ProductDTO;
+import com.eustache.virunga.DTO.ProductResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -7,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("products")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductServiceImpl productService;
@@ -17,9 +19,9 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
-    @PostMapping
+    @PostMapping("insert")
     public ResponseEntity<String> createProduct(
-            @RequestBody ProductDTO  productDTO
+            @RequestBody ProductDTO productDTO
     ){
         return productService.createProduct(productDTO);
     }

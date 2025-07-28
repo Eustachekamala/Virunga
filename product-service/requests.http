@@ -3,3 +3,16 @@ GET https://examples.http-client.intellij.net/get
     ?generated-in=IntelliJ IDEA
 
 ### GET products
+GET http://localhost:8080/api/v1/products/allProducts
+
+### POST insert a product\
+POST localhost:8080/api/v1/products/insert
+Content-Type: application/json
+
+{
+  "name": "Screw driver",
+  "quantity": 20,
+  "status": "NON_URGENT",
+  "category": "ELECTRICITY",
+  "typeProduct": "NON_CONSUMABLE"
+}
