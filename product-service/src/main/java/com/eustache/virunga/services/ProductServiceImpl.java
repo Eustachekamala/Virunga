@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
             product.setImageFile(imagePath);
             productDAO.save(product);
             log.info("Product created: {}", product);
-            return new ResponseEntity<>("Product created successfully", HttpStatus.OK);
+            return new ResponseEntity<>("Product created successfully", HttpStatus.CREATED);
 
         }catch (Exception ex) {
             log.error(ex.getMessage(), ex);
