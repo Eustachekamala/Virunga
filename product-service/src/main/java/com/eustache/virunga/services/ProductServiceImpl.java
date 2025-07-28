@@ -9,9 +9,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import static com.eustache.virunga.utils.UpdateUtil.setNotNull;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,16 +29,10 @@ public class ProductServiceImpl implements ProductService {
     private final ProductDAO productDAO;
 
     @Override
-    public ResponseEntity<String> createProduct(ProductDTO productDTO) {
+    public ResponseEntity<String> createProduct(ProductDTO productDTO, MultipartFile imageFile) {
         try {
             // Path of the uploaded file
-//            String uploadDir = "resources/uploads/images/";
-//            String fileName = UUID.randomUUID() +"_"+file.getOriginalFilename();
-//            Path filePath = Paths.get(uploadDir + fileName);
-//            Files.createDirectories(filePath.getParent());
-//            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            //Use filePath.toString() as image path in the mapper
-            Product product = productMapper.toEntity(productDTO);
+            Product product = productMapper.toEntity(productDTO, imageFile);
             product = productDAO.save(product);
             log.info("Product created: {}", product);
             return new ResponseEntity<>("Product created successfully", HttpStatus.OK);
@@ -43,16 +44,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO) {
+    public ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO, MultipartFile imageFile) {
         try {
             Product existingProduct = productDAO.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
-            existingProduct.setName(productDTO.name());
-            existingProduct.setQuantity(productDTO.quantity());
-            existingProduct.setStatus(productDTO.status());
-            existingProduct.setTypeProduct(productDTO.typeProduct());
-            existingProduct.setUpdatedAt(productDTO.updatedAt());
-            existingProduct = productDAO.save(existingProduct);
+            setNotNull(productDTO.name(), existingProduct::setName);
+            setNotNull(productDTO.category(), existingProduct::setCategory);
+            setNotNull(productDTO.typeProduct(), existingProduct::setTypeProduct);
+            setNotNull(productDTO.status(), existingProduct::setStatus);
+            if (imageFile != null && !imageFile.isEmpty()) {
+                //save the image to a path
+                String newImageFile = file
+            }
             log.info("Product updated: {}", existingProduct);
             return new ResponseEntity<>("Product updated successfully", HttpStatus.OK);
         }catch (Exception ex) {
