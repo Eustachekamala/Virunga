@@ -4,6 +4,7 @@ import com.eustache.virunga.DTO.ProductDTO;
 import com.eustache.virunga.DTO.ProductResponseDTO;
 import com.eustache.virunga.model.Product;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class ProductMapper {
@@ -18,18 +19,19 @@ public class ProductMapper {
                 product.getDescription(),
                 product.getCreatedAt(),
                 product.getUpdatedAt(),
-                product.getImagePath()
+                product.getImageFile()
         );
     }
 
-    public Product toEntity(ProductDTO productDTO) {
+    public Product toEntity(ProductDTO productDTO,  String image) {
         if (productDTO == null) return null;
         Product product = new Product();
         product.setName(productDTO.name());
         product.setQuantity(productDTO.quantity());
         product.setStatus(productDTO.status());
         product.setCategory(productDTO.category());
-        product.setImagePath(productDTO.imagePath());
+        product.setImageFile(image);
+        product.setDescription(productDTO.description());
         product.setTypeProduct(productDTO.typeProduct());
         product.setCreatedAt(productDTO.createdAt());
         product.setUpdatedAt(productDTO.updatedAt());

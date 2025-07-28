@@ -13,8 +13,10 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(nullable = false, unique = true)
     private String name;
-    private int quantity;
+    @Column(nullable = false)
+    private Integer quantity;
     @Enumerated(EnumType.STRING)
     private Status status;
     @Enumerated(EnumType.STRING)
@@ -28,6 +30,6 @@ public class Product {
     @UpdateTimestamp
     private LocalDate updatedAt;
     @Column(nullable = true)
-    private String imagePath;
+    private String imageFile;
 }
 

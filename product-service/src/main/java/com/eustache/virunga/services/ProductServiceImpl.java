@@ -1,7 +1,9 @@
-package com.eustache.virunga;
+package com.eustache.virunga.services;
 
 import com.eustache.virunga.DTO.ProductDTO;
 import com.eustache.virunga.DTO.ProductResponseDTO;
+import com.eustache.virunga.ProductDAO;
+import com.eustache.virunga.ProductMapper;
 import com.eustache.virunga.model.Product;
 import com.eustache.virunga.model.TypeProduct;
 import lombok.RequiredArgsConstructor;
@@ -12,13 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import static com.eustache.virunga.utils.UpdateUtil.setNotNull;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,13 +24,15 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ProductDAO productDAO;
+    private final FileStorageService fileStorageService;
 
     @Override
     public ResponseEntity<String> createProduct(ProductDTO productDTO, MultipartFile imageFile) {
         try {
-            // Path of the uploaded file
-            Product product = productMapper.toEntity(productDTO, imageFile);
-            product = productDAO.save(product);
+            String imagePath = fileStorageService.saveImage(imageFile);
+            Product product = productMapper.toEntity(productDTO, imagePath);
+            product.setImageFile(imagePath);
+            productDAO.save(product);
             log.info("Product created: {}", product);
             return new ResponseEntity<>("Product created successfully", HttpStatus.OK);
 
@@ -49,13 +48,16 @@ public class ProductServiceImpl implements ProductService {
             Product existingProduct = productDAO.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
             setNotNull(productDTO.name(), existingProduct::setName);
+            setNotNull(productDTO.description(), existingProduct::setDescription);
             setNotNull(productDTO.category(), existingProduct::setCategory);
             setNotNull(productDTO.typeProduct(), existingProduct::setTypeProduct);
             setNotNull(productDTO.status(), existingProduct::setStatus);
             if (imageFile != null && !imageFile.isEmpty()) {
                 //save the image to a path
-                String newImageFile = file
+                String newImageFile = fileStorageService.saveImage(imageFile);
+                existingProduct.setImageFile(newImageFile);
             }
+            productDAO.save(existingProduct);
             log.info("Product updated: {}", existingProduct);
             return new ResponseEntity<>("Product updated successfully", HttpStatus.OK);
         }catch (Exception ex) {

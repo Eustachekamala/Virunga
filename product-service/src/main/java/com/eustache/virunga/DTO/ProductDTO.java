@@ -11,11 +11,11 @@ public record ProductDTO(
         @NotBlank(message = "Name is required")
         String name,
         @NotBlank(message = "Quantity is required")
-        int quantity,
+        Integer quantity,
+        String description,
         Status status,
         Category category,
         TypeProduct typeProduct,
-        String imagePath,
         LocalDate createdAt,
         LocalDate updatedAt
 ) {

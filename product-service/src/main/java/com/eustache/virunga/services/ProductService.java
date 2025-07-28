@@ -1,4 +1,4 @@
-package com.eustache.virunga;
+package com.eustache.virunga.services;
 
 import com.eustache.virunga.DTO.ProductDTO;
 import com.eustache.virunga.DTO.ProductResponseDTO;
@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 public interface ProductService {
     ResponseEntity<String> createProduct(ProductDTO productDTO, MultipartFile image);
-    ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO);
+    ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO, MultipartFile image);
     ResponseEntity<String> deleteProduct(Integer id);
     ResponseEntity<List<ProductResponseDTO>> getAllProducts();
     ResponseEntity<ProductResponseDTO> getProductById(Integer id);

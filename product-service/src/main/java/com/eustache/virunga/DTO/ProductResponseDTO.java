@@ -8,12 +8,12 @@ import java.time.LocalDate;
 public record ProductResponseDTO(
         Integer id,
         String name,
-        int quantity,
+        Integer quantity,
         Status status,
         TypeProduct typeProduct,
         String description,
         LocalDate createdAt,
         LocalDate updatedAt,
-        String imagePath
+        String imageFile
 ) {
 }
