@@ -2,7 +2,7 @@ spring:
   application:
     name: users-service-virunga
   datasource:
-    url: jdbc:postgresql://localhost:5433/usersVirungaDB
+    url: jdbc:postgresql://localhost:5433/users-virunga-DB
     username: ${USERNAME}
     password: password
     driver-class-name: org.postgresql.Driver
@@ -14,8 +14,14 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      enabled: true
+      max-file-size: 10MB
+
 server:
-  port: 8088
+  port: 8081
   servlet:
     context-path: /api/v1

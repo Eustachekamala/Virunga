@@ -1,49 +1,59 @@
 package com.eustache.users_service;
 
+import com.eustache.users_service.DTO.UserDTO;
+import com.eustache.users_service.DTO.UserResponseDTO;
 import com.eustache.users_service.model.User;
+import com.eustache.users_service.services.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/users")
+@RequestMapping("users")
 public class UserController {
     private final UserServiceImpl userService;
 
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    @GetMapping("/allUsers")
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(
+    @GetMapping("get/{id}")
+    public ResponseEntity<UserResponseDTO> getUserById(
             @PathVariable Integer id
     ) {
         return userService.getUserById(id);
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<User> getUserByUsername(
+    @GetMapping("get/{username}")
+    public ResponseEntity<UserResponseDTO> getUserByUsername(
             @PathVariable String username
     ){
         return userService.getUserByUsername(username);
     }
 
-    @PostMapping
+    @PostMapping("insert")
     public ResponseEntity<String> createUser(
-            @RequestBody User user) {
-        return userService.createUser(user);
+            @ModelAttribute UserDTO userDAO,
+            @RequestParam("imageFile") MultipartFile imageFile
+    ) {
+        return userService.createUser(userDAO, imageFile);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<String> updateUser(Integer id, @RequestBody User user) {
-        return userService.updateUser(id, user);
+    @PatchMapping("update/{id}")
+    public ResponseEntity<String> updateUser(
+            @PathVariable Integer id,
+            @ModelAttribute UserDTO userDTO,
+            @RequestParam("imageFile") MultipartFile imageFile
+    ) {
+        return userService.updateUser(id, userDTO, imageFile);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<String> deleteUser(
             @PathVariable Integer id
     ) {
