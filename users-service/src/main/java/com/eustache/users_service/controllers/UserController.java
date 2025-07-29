@@ -1,8 +1,7 @@
-package com.eustache.users_service;
+package com.eustache.users_service.controllers;
 
 import com.eustache.users_service.DTO.UserDTO;
 import com.eustache.users_service.DTO.UserResponseDTO;
-import com.eustache.users_service.model.User;
 import com.eustache.users_service.services.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,12 +1,19 @@
 spring:
   application:
     name: users-service-virunga
+#  Database config
   datasource:
     url: jdbc:postgresql://localhost:5433/users-virunga-DB
     username: ${USERNAME}
     password: password
     driver-class-name: org.postgresql.Driver
+#    Security config
+  security:
+    user:
+      name: admin
+      password: admin1234
 
+# JPA config
   jpa:
     hibernate:
       ddl-auto: create-drop
