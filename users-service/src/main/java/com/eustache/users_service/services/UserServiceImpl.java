@@ -107,6 +107,7 @@ public class UserServiceImpl implements UserService {
         try {
             userDAO.deleteById(id);
             log.info("user has been deleted");
+            return new ResponseEntity<>("User has been deleted", HttpStatus.OK);
         }catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         }
