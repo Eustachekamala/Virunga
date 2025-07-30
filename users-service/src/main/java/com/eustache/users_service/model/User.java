@@ -1,7 +1,6 @@
 package com.eustache.users_service.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,7 +24,7 @@ public class User implements UserDetails {
     private String password;
     private String profilePicture;
     @Enumerated(EnumType.STRING)
-    private RoleUser roleUser;
+    private Role role;
     @CreationTimestamp
     private LocalDate createdAt;
     @UpdateTimestamp
@@ -33,7 +32,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(roleUser.name()));
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override

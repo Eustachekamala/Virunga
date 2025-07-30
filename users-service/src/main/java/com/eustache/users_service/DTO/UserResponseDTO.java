@@ -1,12 +1,12 @@
 package com.eustache.users_service.DTO;
 
-import com.eustache.users_service.model.RoleUser;
+import com.eustache.users_service.model.Role;
 
 public record UserResponseDTO(
         Integer id,
         String email,
         String username,
-        RoleUser roleUser,
+        Role role,
         String profilePicture
 ) {
 }

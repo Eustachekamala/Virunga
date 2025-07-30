@@ -1,4 +1,4 @@
-package com.eustache.users_service.requests;
+package com.eustache.users_service.DTO.requests;
 
 import jakarta.validation.constraints.NotBlank;
 

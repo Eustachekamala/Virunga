@@ -15,7 +15,7 @@ public class UserMapper {
             user.getId(),
             user.getEmail(),
             user.getUsername(),
-            user.getRoleUser(),
+            user.getRole(),
             user.getProfilePicture()
         );
     }
@@ -28,6 +28,7 @@ public class UserMapper {
         User user = new User();
         user.setEmail(userDTO.email());
         user.setUsername(userDTO.username());
+        user.setRole(userDTO.role());
         user.setPassword(passwordEncoder.encode(userDTO.password()));
         user.setProfilePicture(profilePicture);
         return user;

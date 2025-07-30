@@ -1,6 +1,6 @@
 package com.eustache.users_service.model;
 
-public enum RoleUser {
+public enum Role {
     ADMIN,
     USER,
 }
