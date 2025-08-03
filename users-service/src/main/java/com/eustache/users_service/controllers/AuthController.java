@@ -2,8 +2,8 @@ package com.eustache.users_service.controllers;
 
 import com.eustache.users_service.DTO.requests.LoginRequest;
 import com.eustache.users_service.utils.JWTUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("users")
-@RequiredArgsConstructor
 @Slf4j
 public class AuthController {
-    private final AuthenticationManager authenticationManager;
-    private final JWTUtil jwtUtil;
+    @Autowired
+    AuthenticationManager authenticationManager;
+    @Autowired
+    JWTUtil jwtUtil;
+
     @PostMapping("login")
     public ResponseEntity<String> login(
             @RequestBody LoginRequest loginRequest
