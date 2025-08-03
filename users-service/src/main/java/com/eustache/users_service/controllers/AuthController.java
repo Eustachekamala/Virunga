@@ -29,10 +29,12 @@ public class AuthController {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()));
-            return new ResponseEntity<>("Logged in successfully: " + jwtUtil.generateToken(loginRequest.username()) , HttpStatus.OK);
+            String token = jwtUtil.generateToken(loginRequest.username());
+            return new ResponseEntity<>("Logged in successfully: " + token , HttpStatus.OK);
         }catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Login failed for {}: {}", loginRequest.username(), e.getMessage());
+            System.out.println("Login failed for " + loginRequest.username());
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>("Failed to login", HttpStatus.UNAUTHORIZED);
     }
 }

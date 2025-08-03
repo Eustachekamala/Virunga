@@ -2,16 +2,17 @@ package com.eustache.users_service.config;
 
 import com.eustache.users_service.filters.JWTAuthFilter;
 import com.eustache.users_service.services.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,11 +35,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) ->
                         authorize
                                 .requestMatchers(
-                                        "/api/v1/users/login"
+                                        "/users/login"
                                 ).permitAll()
                                 .anyRequest().authenticated());
-        http.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
+            http.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return userDetailsService;
     }
 
     @Bean
@@ -47,9 +53,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
+    public AuthenticationManager authenticationManagerBean(
+            UserDetailsService userDetailsService, PasswordEncoder passwordEncoder
+    ) throws Exception {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(daoAuthenticationProvider);
     }
 }
