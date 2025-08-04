@@ -40,10 +40,12 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(new ArrayList<>(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @Override
-    public ResponseEntity<String> createUser(UserDTO userDTO, MultipartFile profilePicture) {
+    public ResponseEntity<String> registerUser(UserDTO userDTO, MultipartFile profilePicture) {
         try {
             String imagePath = fileStorageService.upload(profilePicture);
+            if (userDAO.findByUsername(userDTO.username()).isPresent()) {
+                return new ResponseEntity<>("User already exists", HttpStatus.CONFLICT);
+            }
             User user = userMapper.toEntity(userDTO, imagePath);
             userDAO.save(user);
             log.info("user has been created");

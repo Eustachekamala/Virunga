@@ -17,11 +17,23 @@ public class AdminUserInitializerService {
             if (userDAO.findByUsername("admin").isEmpty()) {
                 User admin = new User();
                 admin.setUsername("admin");
+                admin.setEmail("admin@gmail.com");
                 admin.setPassword(passwordEncoder.encode("admin1234"));
                 admin.setRole(Role.ADMIN);
 
                 userDAO.save(admin);
                 System.out.println("Default admin user has been created");
+            }
+
+            if(userDAO.findByUsername("user").isEmpty()) {
+                User user = new User();
+                user.setUsername("user");
+                user.setEmail("user@gmail.com");
+                user.setPassword(passwordEncoder.encode("user1234"));
+                user.setRole(Role.USER);
+
+                userDAO.save(user);
+                System.out.println("Default user has been created");
             }
         };
     }

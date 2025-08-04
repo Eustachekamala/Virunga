@@ -12,7 +12,6 @@ import java.util.List;
 @Component
 public interface UserService {
     ResponseEntity<List<UserResponseDTO>> getAllUsers();
-    ResponseEntity<String> createUser(UserDTO userDTO,  MultipartFile profilePicture);
     ResponseEntity<UserResponseDTO> getUserById(Integer id);
     ResponseEntity<UserResponseDTO> getUserByUsername(String username);
     ResponseEntity<String> updateUser(Integer id, UserDTO userDTO, MultipartFile profilePicture);
