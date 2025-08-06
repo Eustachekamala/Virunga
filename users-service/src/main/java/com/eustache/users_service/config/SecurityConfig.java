@@ -2,7 +2,7 @@ package com.eustache.users_service.config;
 
 import com.eustache.users_service.filters.JWTAuthFilter;
 import com.eustache.users_service.services.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,11 +22,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
-    @Autowired
-    private JWTAuthFilter authFilter;
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+
+    private final JWTAuthFilter authFilter;
+    private final CustomUserDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
