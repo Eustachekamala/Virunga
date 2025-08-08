@@ -3,7 +3,7 @@ services:
     container_name: product-virunga-service
     image: postgres:latest
     environment:
-      POSTGRES_DB: productVirungaDB
+      POSTGRES_DB: product-virunga-DB
       POSTGRES_USER: ${USERNAME}
       POSTGRES_PASSWORD: ${PASSWORD}
       PGDATA: /data/postgres
