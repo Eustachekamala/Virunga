@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: api-gateway-virunga
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          form-filter:
+            enabled: true
+server:
+  port: 8765
