@@ -2,6 +2,8 @@ package com.eustache.users_service.services;
 
 import com.eustache.users_service.DTO.UserDTO;
 import com.eustache.users_service.DTO.UserResponseDTO;
+import com.eustache.users_service.DTO.products.ProductDTO;
+import com.eustache.users_service.DTO.products.ProductResponseDTO;
 import com.eustache.users_service.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

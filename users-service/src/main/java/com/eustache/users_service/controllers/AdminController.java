@@ -2,6 +2,9 @@ package com.eustache.users_service.controllers;
 
 import com.eustache.users_service.DTO.UserDTO;
 import com.eustache.users_service.DTO.UserResponseDTO;
+import com.eustache.users_service.DTO.products.ProductDTO;
+import com.eustache.users_service.DTO.products.ProductResponseDTO;
+import com.eustache.users_service.feign.ProductClient;
 import com.eustache.users_service.services.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("users")
-public class UserController {
+public class AdminController {
     private final UserServiceImpl userService;
 
     @GetMapping("/allUsers")
@@ -61,4 +64,5 @@ public class UserController {
            return new ResponseEntity<>("Error deleting user", HttpStatus.NOT_FOUND);
        }
     }
+
 }

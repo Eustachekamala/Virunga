@@ -2,11 +2,15 @@ package com.eustache.users_service.services;
 
 import com.eustache.users_service.DTO.UserDTO;
 import com.eustache.users_service.DTO.UserResponseDTO;
+import com.eustache.users_service.DTO.products.ProductDTO;
+import com.eustache.users_service.DTO.products.ProductResponseDTO;
 import com.eustache.users_service.UserDAO;
 import com.eustache.users_service.UserMapper;
+import com.eustache.users_service.feign.ProductClient;
 import com.eustache.users_service.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserDAO userDAO;
     private final UserMapper userMapper;
     private final FileStorageService fileStorageService;
+    private final ProductClient  productClient;
 
     @Override
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
