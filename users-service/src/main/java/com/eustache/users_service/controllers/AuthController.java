@@ -4,6 +4,7 @@ import com.eustache.users_service.DTO.UserDTO;
 import com.eustache.users_service.DTO.requests.LoginRequest;
 import com.eustache.users_service.services.UserServiceImpl;
 import com.eustache.users_service.utils.JWTUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
