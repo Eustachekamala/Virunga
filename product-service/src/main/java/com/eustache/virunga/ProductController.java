@@ -38,10 +38,10 @@ public class ProductController {
     }
 
     @GetMapping("type/{nonConsumable}")
-    public ResponseEntity<List<ProductResponseDTO>> getAllByTypeConConsumable(
+    public ResponseEntity<List<ProductResponseDTO>> getProductByNoConsumable(
             @PathVariable String nonConsumable
     ){
-        return productService.getProductByConsumable(nonConsumable);
+        return productService.getProductByNoConsumable(nonConsumable);
     }
 
     @PatchMapping("update/{id}")
