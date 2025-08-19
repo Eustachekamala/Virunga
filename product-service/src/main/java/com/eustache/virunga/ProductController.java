@@ -53,14 +53,13 @@ public class ProductController {
         return productService.updateProduct(id, productDTO, image);
     }
 
-    @GetMapping("get/{name}")
+    @GetMapping("getByName/{name}")
     public ResponseEntity<List<ProductResponseDTO>> getProductByName(
             @PathVariable String name
     ){
         return productService.getProductByName(name);
     }
 
-    @GetMapping("get/{id}")
     public ResponseEntity<ProductResponseDTO> getProductById(
             @PathVariable Integer id
     ){
