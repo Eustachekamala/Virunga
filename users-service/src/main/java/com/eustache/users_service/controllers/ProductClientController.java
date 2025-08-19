@@ -12,6 +12,14 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("users")
+@CrossOrigin(origins = "*", maxAge = 3600)
+// This controller is for user-related product operations, typically for admin users.
+// It allows admins to manage products, including creating, updating, deleting, and retrieving products.
+// The methods are secured with the 'ADMIN' authority, ensuring that only users with the appropriate
+// permissions can access these endpoints.
+// The controller interacts with the ProductClient service to perform these operations.
+// The endpoints are designed to handle multipart file uploads for product images.
 public class ProductClientController {
     private final ProductClient productClientService;
 
