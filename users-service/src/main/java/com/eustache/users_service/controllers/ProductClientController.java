@@ -4,6 +4,7 @@ import com.eustache.users_service.DTO.products.ProductDTO;
 import com.eustache.users_service.DTO.products.ProductResponseDTO;
 import com.eustache.users_service.feign.ProductClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,64 +13,83 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("users")
+@RequestMapping("/users/admin/products")
 @CrossOrigin(origins = "*", maxAge = 3600)
-// This controller is for user-related product operations, typically for admin users.
-// It allows admins to manage products, including creating, updating, deleting, and retrieving products.
-// The methods are secured with the 'ADMIN' authority, ensuring that only users with the appropriate
-// permissions can access these endpoints.
-// The controller interacts with the ProductClient service to perform these operations.
-// The endpoints are designed to handle multipart file uploads for product images.
+// Controller for ADMIN product management via FeignClient to PRODUCT-SERVICE-VIRUNGA
 public class ProductClientController {
+
     private final ProductClient productClientService;
 
-    //Product methods
-    @GetMapping("get/allProducts")
+    // Get all products
+    @GetMapping("/all")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<ProductResponseDTO> userGetProducts() {
+    public List<ProductResponseDTO> getAllProducts() {
         return productClientService.getAll();
     }
 
-    @PostMapping("insert/products")
+    // Create product
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String userCreateProduct(
+    public String createProduct(
             @ModelAttribute ProductDTO productDTO,
             @RequestParam("imageFile") MultipartFile image
     ) {
         return productClientService.createProduct(productDTO, image);
     }
 
-    @GetMapping("products/type/{consumable}")
+    // Get products by consumable type
+    @GetMapping("/type/consumable/{consumable}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<ProductResponseDTO> userGetConsumableProducts(
+    public List<ProductResponseDTO> getConsumableProducts(
             @PathVariable String consumable
     ) {
         return productClientService.getAllByTypeConsumable(consumable);
     }
 
-    @GetMapping("products/type/{noConsumable}")
+    // Get products by non-consumable type
+    @GetMapping("/type/non-consumable/{nonConsumable}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<ProductResponseDTO> userGetNoConsumableProducts(
-            @PathVariable String noConsumable
+    public List<ProductResponseDTO> getNonConsumableProducts(
+            @PathVariable String nonConsumable
     ) {
-        return productClientService.getProductByNoConsumable(noConsumable);
+        return productClientService.getProductByNoConsumable(nonConsumable);
     }
 
-    @PatchMapping("products/update/{id}")
+    // Get product by ID
+    @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String userUpdateProduct(
+    public ProductResponseDTO getProductById(
+            @PathVariable Integer id
+    ) {
+        return productClientService.getProductById(id);
+    }
+
+    // Get product by name
+    @GetMapping("/name/{name}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<ProductResponseDTO> getProductByName(
+            @PathVariable String name
+    ) {
+        return productClientService.getProductByName(name);
+    }
+
+    // Update product
+    @PatchMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public String updateProduct(
             @PathVariable Integer id,
-            @ModelAttribute ProductDTO  productDTO,
-            @RequestParam("imageFile")  MultipartFile image
-    ){
+            @ModelAttribute ProductDTO productDTO,
+            @RequestParam("imageFile") MultipartFile image
+    ) {
         return productClientService.updateProduct(id, productDTO, image);
     }
 
-    @DeleteMapping("products/delete/{id}")
+    // Delete product
+    @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String userDeleteProduct(
+    public String deleteProduct(
             @PathVariable Integer id
-    ){
+    ) {
         return productClientService.deleteProductById(id);
     }
 }
