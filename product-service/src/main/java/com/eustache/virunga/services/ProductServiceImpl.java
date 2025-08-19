@@ -125,6 +125,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<List<ProductResponseDTO>> getProductByConsumable(String consumable) {
+        return getListResponseEntity(consumable);
+    }
+
+    private ResponseEntity<List<ProductResponseDTO>> getListResponseEntity(String consumable) {
         try{
             return new ResponseEntity<>(
                     productDAO.findProductByTypeProduct(TypeProduct.valueOf(consumable))
@@ -141,17 +145,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<List<ProductResponseDTO>> getProductByNoConsumable(String noConsumable) {
-        try{
-            return new ResponseEntity<>(
-                    productDAO.findProductByTypeProduct(TypeProduct.valueOf(noConsumable))
-                            .stream()
-                            .map(productMapper::toDto)
-                            .collect(Collectors.toList()),
-                    HttpStatus.OK
-            );
-        }catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
-        }
-        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return getListResponseEntity(noConsumable);
     }
 }
