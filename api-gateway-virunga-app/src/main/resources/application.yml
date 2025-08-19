@@ -4,8 +4,17 @@ spring:
   cloud:
     gateway:
       server:
-        webmvc:
-          form-filter:
-            enabled: true
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
 server:
   port: 8765
+
+# For debugging
+logging:
+  level:
+    org.springframework.security.authentication: DEBUG
+    org.springframework.security.web: DEBUG
+    org.springframework.security: DEBUG
