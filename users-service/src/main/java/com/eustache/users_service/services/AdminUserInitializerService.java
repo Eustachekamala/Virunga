@@ -17,6 +17,8 @@ public class AdminUserInitializerService {
             if (userDAO.findByUsername("admin").isEmpty()) {
                 User admin = new User();
                 admin.setUsername("admin");
+                admin.setFirstName("Eustache");
+                admin.setLastName("Kamala");
                 admin.setEmail("admin@gmail.com");
                 admin.setPassword(passwordEncoder.encode("admin1234"));
                 admin.setRole(Role.ADMIN);
@@ -28,6 +30,8 @@ public class AdminUserInitializerService {
             if(userDAO.findByUsername("user").isEmpty()) {
                 User user = new User();
                 user.setUsername("user");
+                user.setFirstName("John");
+                user.setLastName("Doe");
                 user.setEmail("user@gmail.com");
                 user.setPassword(passwordEncoder.encode("user1234"));
                 user.setRole(Role.USER);

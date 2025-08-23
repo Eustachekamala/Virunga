@@ -15,6 +15,8 @@ public class UserMapper {
             user.getId(),
             user.getEmail(),
             user.getUsername(),
+            user.getFirstName(),
+            user.getLastName(),
             user.getRole(),
             user.getProfilePicture(),
             user.getCreatedAt(),
@@ -30,6 +32,8 @@ public class UserMapper {
         User user = new User();
         user.setEmail(userDTO.email());
         user.setUsername(userDTO.username());
+        user.setFirstName(userDTO.firstName());
+        user.setLastName(userDTO.lastName());
         user.setRole(userDTO.role());
         user.setPassword(passwordEncoder.encode(userDTO.password()));
         user.setProfilePicture(profilePicture);

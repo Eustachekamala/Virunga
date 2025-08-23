@@ -23,6 +23,8 @@ public class User implements UserDetails {
     private Integer id;
     private String email;
     private String username;
+    private String firstName;
+    private String lastName;
     private String password;
     private String profilePicture;
     @Enumerated(EnumType.STRING)
