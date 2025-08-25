@@ -8,8 +8,6 @@ public record UserResponseDTO(
         Integer id,
         String email,
         String username,
-        String firstName,
-        String lastName,
         Role role,
         String profilePicture,
         LocalDateTime createdAt,
