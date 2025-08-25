@@ -1,0 +1,169 @@
+version: '3.8'
+
+services:
+  # Eureka Server
+  eureka-server:
+    container_name: virunga-eureka-server
+    build: ./eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - virunga-network
+    depends_on:
+      - users-db
+      - products-db
+    restart: unless-stopped
+
+  # API Gateway
+  api-gateway:
+    container_name: virunga-api-gateway
+    build: ./api-gateway-virunga-app
+    ports:
+      - "8765:8765"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - JWT_SECRET=your-super-secret-jwt-key-here-make-it-long-and-secure-123456789
+    networks:
+      - virunga-network
+    depends_on:
+      - eureka-server
+    restart: unless-stopped
+
+  # Users Service
+  users-service:
+    container_name: virunga-users-service
+    build: ./users-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://users-db:5432/users-virunga-DB
+      - SPRING_DATASOURCE_USERNAME=${USERNAME:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${PASSWORD:-password}
+      - JWT_SECRET=your-super-secret-jwt-key-here-make-it-long-and-secure-123456789
+    networks:
+      - virunga-network
+    depends_on:
+      - users-db
+      - eureka-server
+    restart: unless-stopped
+    volumes:
+      - ./users-service/uploads:/app/uploads
+
+  # Product Service
+  product-service:
+    container_name: virunga-product-service
+    build: ./product-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://products-db:5432/product-virunga-DB
+      - SPRING_DATASOURCE_USERNAME=${USERNAME:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${PASSWORD:-password}
+    networks:
+      - virunga-network
+    depends_on:
+      - products-db
+      - eureka-server
+    restart: unless-stopped
+    volumes:
+      - ./product-service/uploads:/app/uploads
+
+  # Users Database
+  users-db:
+    container_name: virunga-users-db
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: users-virunga-DB
+      POSTGRES_USER: ${USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${PASSWORD:-password}
+      PGDATA: /data/postgres
+    volumes:
+      - users-db-data:/data/postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - virunga-network
+    restart: unless-stopped
+
+  # Products Database
+  products-db:
+    container_name: virunga-products-db
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: product-virunga-DB
+      POSTGRES_USER: ${USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${PASSWORD:-password}
+      PGDATA: /data/postgres
+    volumes:
+      - products-db-data:/data/postgres
+    ports:
+      - "5434:5432"
+    networks:
+      - virunga-network
+    restart: unless-stopped
+
+  # Redis for Session Management (Optional)
+  redis:
+    container_name: virunga-redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - virunga-network
+    restart: unless-stopped
+
+  # Prometheus for Monitoring (Optional)
+  prometheus:
+    container_name: virunga-prometheus
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - virunga-network
+    restart: unless-stopped
+
+  # Frontend Application
+  frontend:
+    container_name: virunga-frontend
+    build: ./frontend
+    ports:
+      - "3000:80"
+    networks:
+      - virunga-network
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+
+  # Grafana for Visualization (Optional)
+  grafana:
+    container_name: virunga-grafana
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - virunga-network
+    restart: unless-stopped
+
+networks:
+  virunga-network:
+    driver: bridge
+
+volumes:
+  users-db-data:
+  products-db-data:
+  prometheus-data:
+  grafana-data:

@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: users-service-virunga
+  # Database config for Docker
+  datasource:
+    url: jdbc:postgresql://users-db:5432/users-virunga-DB
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  # Security config
+  security:
+    user:
+      name: admin
+      password: admin1234
+
+# JPA config
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      enabled: true
+      max-file-size: 10MB
+
+server:
+  port: 8081
+  servlet:
+    context-path: /api/v1/
+
+# Eureka Configuration for Docker
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    hostname: users-service
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:your-super-secret-jwt-key-here-make-it-long-and-secure-123456789}
+
+# Actuator Configuration for Docker
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging Configuration for Docker
+logging:
+  level:
+    com.eustache.users_service: DEBUG
+    org.springframework.security: INFO
+    org.springframework.web: INFO
