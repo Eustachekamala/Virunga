@@ -3,8 +3,8 @@ global:
   evaluation_interval: 15s
 
 rule_files:
-  # - "first_rules.yml"
-  # - "second_rules.yml"
+# - "first_rules.yml"
+# - "second_rules.yml"
 
 scrape_configs:
   # Prometheus itself
@@ -15,33 +15,33 @@ scrape_configs:
   # Eureka Server
   - job_name: 'eureka-server'
     static_configs:
-      - targets: ['localhost:8761']
+      - targets: ['eureka-server:8761']
     metrics_path: '/actuator/prometheus'
 
   # API Gateway
   - job_name: 'api-gateway'
     static_configs:
-      - targets: ['localhost:8765']
+      - targets: ['api-gateway:8765']
     metrics_path: '/actuator/prometheus'
 
   # Users Service
   - job_name: 'users-service'
     static_configs:
-      - targets: ['localhost:8081']
+      - targets: ['users-service:8081']
     metrics_path: '/actuator/prometheus'
 
   # Product Service
   - job_name: 'product-service'
     static_configs:
-      - targets: ['localhost:8080']
+      - targets: ['product-service:8080']
     metrics_path: '/actuator/prometheus'
 
-  # Spring Boot Actuator endpoints
+  # Optional: Group Spring Boot Actuator endpoints
   - job_name: 'spring-actuator'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets:
-        - 'localhost:8761'  # Eureka
-        - 'localhost:8765'  # API Gateway
-        - 'localhost:8081'  # Users Service
-        - 'localhost:8080'  # Product Service
+          - 'eureka-server:8761'
+          - 'api-gateway:8765'
+          - 'users-service:8081'
+          - 'product-service:8080'

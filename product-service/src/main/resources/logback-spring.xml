@@ -42,3 +42,5 @@
     <logger name="com.eustache.virunga" level="DEBUG"/>
     <logger name="org.springframework.web" level="INFO"/>
 </configuration>
+
+

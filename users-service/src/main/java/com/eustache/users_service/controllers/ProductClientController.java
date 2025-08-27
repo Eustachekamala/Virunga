@@ -22,14 +22,12 @@ public class ProductClientController {
 
     // Get all products
     @GetMapping("/all")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<ProductResponseDTO> getAllProducts() {
         return productClientService.getAll();
     }
 
     // Create product
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAuthority('ADMIN')")
     public String createProduct(
             @ModelAttribute ProductDTO productDTO,
             @RequestParam("imageFile") MultipartFile image
@@ -39,7 +37,6 @@ public class ProductClientController {
 
     // Get products by consumable type
     @GetMapping("/type/consumable/{consumable}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<ProductResponseDTO> getConsumableProducts(
             @PathVariable String consumable
     ) {
@@ -48,7 +45,6 @@ public class ProductClientController {
 
     // Get products by non-consumable type
     @GetMapping("/type/non-consumable/{nonConsumable}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<ProductResponseDTO> getNonConsumableProducts(
             @PathVariable String nonConsumable
     ) {
@@ -57,7 +53,6 @@ public class ProductClientController {
 
     // Get product by ID
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ProductResponseDTO getProductById(
             @PathVariable Integer id
     ) {
@@ -66,7 +61,6 @@ public class ProductClientController {
 
     // Get product by name
     @GetMapping("/name/{name}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public List<ProductResponseDTO> getProductByName(
             @PathVariable String name
     ) {
@@ -75,7 +69,6 @@ public class ProductClientController {
 
     // Update product
     @PatchMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAuthority('ADMIN')")
     public String updateProduct(
             @PathVariable Integer id,
             @ModelAttribute ProductDTO productDTO,

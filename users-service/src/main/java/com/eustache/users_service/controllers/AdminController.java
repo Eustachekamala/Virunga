@@ -22,13 +22,11 @@ public class AdminController {
     private final UserServiceImpl userService;
 
     @GetMapping("/allUsers")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("get/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserResponseDTO> getUserById(
             @PathVariable Integer id
     ) {
@@ -36,7 +34,6 @@ public class AdminController {
     }
 
     @GetMapping("get/{username}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserResponseDTO> getUserByUsername(
             @PathVariable String username
     ){
@@ -44,7 +41,6 @@ public class AdminController {
     }
 
     @PatchMapping("update/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> updateUser(
             @PathVariable Integer id,
             @ModelAttribute UserDTO userDTO,
@@ -54,7 +50,6 @@ public class AdminController {
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteUser(
             @PathVariable Integer id
     ) {

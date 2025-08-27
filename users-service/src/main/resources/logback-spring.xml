@@ -43,3 +43,5 @@
     <logger name="org.springframework.security" level="INFO"/>
     <logger name="org.springframework.web" level="INFO"/>
 </configuration>
+
+

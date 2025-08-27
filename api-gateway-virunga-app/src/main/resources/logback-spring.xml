@@ -43,3 +43,5 @@
     <logger name="org.springframework.security" level="INFO"/>
     <logger name="com.eustache.api_gateway_virunga_app" level="DEBUG"/>
 </configuration>
+
+

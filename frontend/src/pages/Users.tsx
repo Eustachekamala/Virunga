@@ -30,38 +30,14 @@ const Users: React.FC = () => {
   const queryClient = useQueryClient();
 
   // Fetch users
-  const { data: users, isLoading } = useQuery({
-    queryKey: ['users'],
-    queryFn: async (): Promise<User[]> => {
-      // Mock data - replace with real API call
-      return [
-        {
-          id: '1',
-          username: 'admin',
-          email: 'admin@virunga.com',
-          role: 'ADMIN',
-          status: 'active',
-          createdAt: '2024-01-15',
+    const { data: users, isLoading } = useQuery({
+        queryKey: ['users'],
+        queryFn: async (): Promise<User[]> => {
+            const res = await fetch('/api/v1/users/allUsers');
+            if (!res.ok) throw new Error('Failed to fetch users');
+            return res.json();
         },
-        {
-          id: '2',
-          username: 'john_doe',
-          email: 'john@virunga.com',
-          role: 'USER',
-          status: 'active',
-          createdAt: '2024-01-20',
-        },
-        {
-          id: '3',
-          username: 'jane_smith',
-          email: 'jane@virunga.com',
-          role: 'MODERATOR',
-          status: 'inactive',
-          createdAt: '2024-01-25',
-        },
-      ];
-    },
-  });
+    });
 
   // Filter users based on search and role
   const filteredUsers = users?.filter(user => {

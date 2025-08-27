@@ -62,3 +62,5 @@ echo "🧹 Cleaning up test images..."
 docker rmi test-eureka test-gateway test-users test-products test-frontend
 
 echo "✅ Build testing completed successfully!"
+
+

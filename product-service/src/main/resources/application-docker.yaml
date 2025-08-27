@@ -56,3 +56,5 @@ logging:
   level:
     com.eustache.virunga: DEBUG
     org.springframework.web: INFO
+
+

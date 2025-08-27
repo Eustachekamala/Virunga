@@ -68,3 +68,5 @@ logging:
     com.eustache.users_service: DEBUG
     org.springframework.security: INFO
     org.springframework.web: INFO
+
+
