@@ -54,7 +54,7 @@ const Login: React.FC = () => {
             <span className="text-2xl font-bold text-white">V</span>
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Welcome to Virunga
+            Welcome to Virunga Management System
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Sign in to your microservices dashboard
@@ -144,12 +144,12 @@ const Login: React.FC = () => {
             </button>
           </form>
 
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-600 mb-2">Demo Credentials:</p>
-            <p className="text-xs text-gray-500">Username: admin</p>
-            <p className="text-xs text-gray-500">Password: admin1234</p>
-          </div>
+          {/*/!* Demo Credentials *!/*/}
+          {/*<div className="mt-6 p-4 bg-gray-50 rounded-lg">*/}
+          {/*  <p className="text-xs text-gray-600 mb-2">Demo Credentials:</p>*/}
+          {/*  <p className="text-xs text-gray-500">Username: admin</p>*/}
+          {/*  <p className="text-xs text-gray-500">Password: admin1234</p>*/}
+          {/*</div>*/}
         </div>
 
         {/* Footer */}
