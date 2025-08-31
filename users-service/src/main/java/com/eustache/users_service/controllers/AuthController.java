@@ -56,4 +56,11 @@ public class AuthController {
     ) {
         return userService.registerUser(userDAO, imageFile);
     }
+
+    @PostMapping("logout/{id}")
+    public ResponseEntity<String> logout(
+        @PathVariable Integer id
+    ){
+        return ResponseEntity.ok("User " + id + " logged out. Please remove token on client side.");
+    }
 }
