@@ -6,9 +6,10 @@ import {
     PencilIcon,
     TrashIcon,
     EyeIcon,
-    CubeIcon
+    CubeIcon,
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { apiService } from "../services/api.ts";
 
 interface Product {
     id: number;
@@ -30,37 +31,58 @@ const Products: React.FC = () => {
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const queryClient = useQueryClient();
 
-    const { data: products, isLoading } = useQuery({
+    const api = apiService();
+
+    // ✅ Fetch products with axios
+    const { data: products = [], isLoading } = useQuery({
         queryKey: ['products'],
         queryFn: async (): Promise<Product[]> => {
-            const res = await fetch('/api/v1/users/admin/products/all');
-            if (!res.ok) throw new Error('Failed to fetch products');
-            return res.json();
+            const res = await api.get('/products/allProducts');
+            return res.data;
         },
     });
 
-    const filteredProducts = products?.filter(product => {
-        const matchesSearch =
-            product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-        const matchesType =
-            selectedType === 'all' ||
-            product.typeProduct.toLowerCase() === selectedType;
-        return matchesSearch && matchesType;
+    // ✅ Create product
+    const createProductMutation = useMutation({
+        mutationFn: async (formData: FormData) => {
+            const res = await api.post('/products/insert', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return res.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            toast.success('Product created successfully');
+        },
+        onError: () => toast.error('Failed to create product'),
     });
 
+    // ✅ Update product
+    const updateProductMutation = useMutation({
+        mutationFn: async ({ id, formData }: { id: number; formData: FormData }) => {
+            const res = await api.patch(`/products/update/${id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return res.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            toast.success('Product updated successfully');
+        },
+        onError: () => toast.error('Failed to update product'),
+    });
+
+    // ✅ Delete product
     const deleteProductMutation = useMutation({
-        mutationFn: async (_productId: number) => {
-            // Replace with real API call
-            return Promise.resolve();
+        mutationFn: async (productId: number) => {
+            const res = await api.delete(`/products/${productId}`);
+            return res.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['products'] });
             toast.success('Product deleted successfully');
         },
-        onError: () => {
-            toast.error('Failed to delete product');
-        },
+        onError: () => toast.error('Failed to delete product'),
     });
 
     const handleDeleteProduct = (productId: number) => {
@@ -69,16 +91,39 @@ const Products: React.FC = () => {
         }
     };
 
-    const getTypeBadgeColor = (typeProduct: string) => {
-        return typeProduct === 'CONSUMABLE'
+    // Filtering
+    const filteredProducts = products.filter((product) => {
+        const matchesSearch =
+            product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+        const matchesType =
+            selectedType === 'all' || product.typeProduct.toLowerCase() === selectedType;
+        return matchesSearch && matchesType;
+    });
+
+    const getTypeBadgeColor = (typeProduct: string) =>
+        typeProduct === 'CONSUMABLE'
             ? 'bg-green-100 text-green-800'
             : 'bg-blue-100 text-blue-800';
-    };
 
-    const getStatusBadgeColor = (status: string) => {
-        return status === 'ACTIVE'
+    const getStatusBadgeColor = (status: string) =>
+        status === 'ACTIVE'
             ? 'bg-green-100 text-green-800'
             : 'bg-gray-100 text-gray-800';
+
+    // Handle submit Add/Edit form
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+
+        if (editingProduct) {
+            updateProductMutation.mutate({ id: editingProduct.id, formData });
+        } else {
+            createProductMutation.mutate(formData);
+        }
+
+        setShowAddModal(false);
+        setEditingProduct(null);
     };
 
     if (isLoading) {
@@ -141,7 +186,10 @@ const Products: React.FC = () => {
             {/* Products Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProducts?.map((product) => (
-                    <div key={String(product.id)} className="card hover:shadow-medium transition-shadow">
+                    <div
+                        key={String(product.id)}
+                        className="card hover:shadow-medium transition-shadow"
+                    >
                         {/* Product Image */}
                         <div className="aspect-w-16 aspect-h-9 mb-4">
                             <img
@@ -154,8 +202,12 @@ const Products: React.FC = () => {
                         {/* Product Info */}
                         <div className="space-y-3">
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
-                                <p className="text-sm text-gray-600 line-clamp-2">{product.description ?? ''}</p>
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                    {product.name}
+                                </h3>
+                                <p className="text-sm text-gray-600 line-clamp-2">
+                                    {product.description ?? ''}
+                                </p>
                             </div>
 
                             <div className="flex items-center justify-between">
@@ -163,10 +215,18 @@ const Products: React.FC = () => {
                   Qty: {product.quantity}
                 </span>
                                 <div className="flex space-x-2">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeBadgeColor(product.typeProduct)}`}>
+                  <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeBadgeColor(
+                          product.typeProduct,
+                      )}`}
+                  >
                     {product.typeProduct}
                   </span>
-                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(product.status)}`}>
+                                    <span
+                                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
+                                            product.status,
+                                        )}`}
+                                    >
                     {product.status}
                   </span>
                                 </div>
@@ -186,7 +246,9 @@ const Products: React.FC = () => {
                                     Edit
                                 </button>
                                 <button
-                                    onClick={() => {/* View product details */}}
+                                    onClick={() => {
+                                        /* View product details */
+                                    }}
                                     className="flex-1 btn-secondary text-sm py-2"
                                 >
                                     <EyeIcon className="h-4 w-4 mr-1" />
@@ -210,12 +272,13 @@ const Products: React.FC = () => {
                     <div className="mx-auto h-12 w-12 text-gray-400">
                         <CubeIcon className="h-12 w-12" />
                     </div>
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No products found</h3>
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                        No products found
+                    </h3>
                     <p className="mt-1 text-sm text-gray-500">
                         {searchTerm || selectedType !== 'all'
                             ? 'Try adjusting your search or filter criteria.'
-                            : 'Get started by creating a new product.'
-                        }
+                            : 'Get started by creating a new product.'}
                     </p>
                 </div>
             )}
@@ -232,16 +295,18 @@ const Products: React.FC = () => {
                                     {editingProduct ? 'Edit Product' : 'Add New Product'}
                                 </h3>
 
-                                <form className="space-y-4">
+                                <form className="space-y-4" onSubmit={handleSubmit}>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Product Name
                                         </label>
                                         <input
                                             type="text"
+                                            name="name"
                                             className="input-field"
                                             defaultValue={editingProduct?.name || ''}
                                             placeholder="Enter product name"
+                                            required
                                         />
                                     </div>
 
@@ -250,6 +315,7 @@ const Products: React.FC = () => {
                                             Description
                                         </label>
                                         <textarea
+                                            name="description"
                                             className="input-field"
                                             rows={3}
                                             defaultValue={editingProduct?.description || ''}
@@ -263,9 +329,11 @@ const Products: React.FC = () => {
                                         </label>
                                         <input
                                             type="number"
+                                            name="quantity"
                                             className="input-field"
                                             defaultValue={editingProduct?.quantity || ''}
                                             placeholder="Enter quantity"
+                                            required
                                         />
                                     </div>
 
@@ -273,7 +341,11 @@ const Products: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Type
                                         </label>
-                                        <select className="input-field" defaultValue={editingProduct?.typeProduct || 'NON_CONSUMABLE'}>
+                                        <select
+                                            name="typeProduct"
+                                            className="input-field"
+                                            defaultValue={editingProduct?.typeProduct || 'NON_CONSUMABLE'}
+                                        >
                                             <option value="NON_CONSUMABLE">Non-Consumable</option>
                                             <option value="CONSUMABLE">Consumable</option>
                                         </select>
@@ -283,35 +355,39 @@ const Products: React.FC = () => {
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Status
                                         </label>
-                                        <select className="input-field" defaultValue={editingProduct?.status || 'ACTIVE'}>
+                                        <select
+                                            name="status"
+                                            className="input-field"
+                                            defaultValue={editingProduct?.status || 'ACTIVE'}
+                                        >
                                             <option value="ACTIVE">Active</option>
                                             <option value="INACTIVE">Inactive</option>
                                         </select>
                                     </div>
-                                </form>
-                            </div>
 
-                            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <button
-                                    type="button"
-                                    className="btn-primary sm:ml-3 sm:w-auto"
-                                    onClick={() => {
-                                        setShowAddModal(false);
-                                        setEditingProduct(null);
-                                    }}
-                                >
-                                    {editingProduct ? 'Update' : 'Create'}
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn-secondary mt-3 sm:mt-0 sm:w-auto"
-                                    onClick={() => {
-                                        setShowAddModal(false);
-                                        setEditingProduct(null);
-                                    }}
-                                >
-                                    Cancel
-                                </button>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Image
+                                        </label>
+                                        <input type="file" name="imageFile" className="input-field" />
+                                    </div>
+
+                                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                        <button type="submit" className="btn-primary sm:ml-3 sm:w-auto">
+                                            {editingProduct ? 'Update' : 'Create'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn-secondary mt-3 sm:mt-0 sm:w-auto"
+                                            onClick={() => {
+                                                setShowAddModal(false);
+                                                setEditingProduct(null);
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

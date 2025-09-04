@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
-  HomeIcon, 
-  UsersIcon, 
-  CubeIcon, 
-  ServerIcon,
+  HomeIcon,
+  CubeIcon,
   Bars3Icon,
   XMarkIcon,
   BellIcon,
@@ -23,9 +21,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: HomeIcon },
-    { name: 'Users', href: '/users', icon: UsersIcon },
     { name: 'Products', href: '/products', icon: CubeIcon },
-    { name: 'Services', href: '/services', icon: ServerIcon },
   ];
 
   const handleLogout = () => {
