@@ -75,12 +75,11 @@ public class ProductController {
         return productService.deleteProduct(id);
     }
 
-    @GetMapping("home")
+    @GetMapping("/home")
     public String home(
             @AuthenticationPrincipal Jwt jwt
     ) {
-        String name = jwt.getClaim("preferred_username");
-        String email = jwt.getClaim("email");
-        return "Hello" + name + "!" + "(" + email + ")";
+        String username = jwt.getClaim("preferred_username");
+        return "Hello " + username + "!";
     }
 }
