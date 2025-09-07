@@ -8,18 +8,26 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class ProductMapper {
+    private static final int DEFAULT_STOCK_ALERT_THRESHOLD = 5;
     public ProductResponseDTO toDto(Product product) {
         if (product == null) return null;
+
+        boolean lowStock = product.getQuantity() != null
+                && product.getStockAlertThreshold() != null
+                && product.getQuantity() <= product.getStockAlertThreshold();
+
         return new ProductResponseDTO(
                 product.getId(),
                 product.getName(),
                 product.getQuantity(),
                 product.getStatus(),
                 product.getTypeProduct(),
+                product.getStockAlertThreshold(),
                 product.getDescription(),
                 product.getCreatedAt(),
                 product.getUpdatedAt(),
-                product.getImageFile()
+                product.getImageFile(),
+                lowStock
         );
     }
 
@@ -27,7 +35,16 @@ public class ProductMapper {
         if (productDTO == null) return null;
         Product product = new Product();
         product.setName(productDTO.name());
-        product.setQuantity(productDTO.quantity());
+        // Set quantity; default to 0 if null
+        product.setQuantity(productDTO.quantity() != null ? productDTO.quantity() : 0);
+
+        // Set stock alert threshold; default if not provided
+        product.setStockAlertThreshold(
+                productDTO.stockAlertThreshold() != null
+                        ? productDTO.stockAlertThreshold()
+                        : DEFAULT_STOCK_ALERT_THRESHOLD
+        );
+        product.setStockAlertThreshold(productDTO.quantity());
         product.setStatus(productDTO.status());
         product.setCategory(productDTO.category());
         product.setImageFile(image);

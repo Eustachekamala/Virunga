@@ -11,9 +11,11 @@ public record ProductResponseDTO(
         Integer quantity,
         Status status,
         TypeProduct typeProduct,
+        Integer stockAlertThreshold,
         String description,
         LocalDate createdAt,
         LocalDate updatedAt,
-        String imageFile
+        String imageFile,
+        boolean isLowStock
 ) {
 }

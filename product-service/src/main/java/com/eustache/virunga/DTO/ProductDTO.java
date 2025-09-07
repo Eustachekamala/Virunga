@@ -12,6 +12,7 @@ public record ProductDTO(
         String name,
         @NotBlank(message = "Quantity is required")
         Integer quantity,
+        Integer stockAlertThreshold,
         String description,
         Status status,
         Category category,

@@ -17,6 +17,8 @@ public class Product {
     private String name;
     @Column(nullable = false)
     private Integer quantity;
+
+    private Integer stockAlertThreshold;
     @Enumerated(EnumType.STRING)
     private Status status;
     @Enumerated(EnumType.STRING)

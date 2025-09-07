@@ -18,4 +18,5 @@ public interface ProductService {
     ResponseEntity<List<ProductResponseDTO>> getProductByName(String name);
     ResponseEntity<List<ProductResponseDTO>> getProductByConsumable(String consumable);
     ResponseEntity<List<ProductResponseDTO>> getProductByNoConsumable(String noConsumable);
+    ResponseEntity<List<ProductResponseDTO>> getLowStockProducts();
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProductInitializer {
+    private static final int DEFAULT_STOCK_ALERT_THRESHOLD = 5;
     @Bean
     public CommandLineRunner commandLineRunner(ProductDAO productDAO) {
         return args -> {
@@ -21,9 +22,10 @@ public class ProductInitializer {
                 product.setCategory(Category.ELECTRICITY);
                 product.setTypeProduct(TypeProduct.NON_CONSUMABLE);
                 product.setQuantity(30);
+                product.setStockAlertThreshold(DEFAULT_STOCK_ALERT_THRESHOLD);
                 product.setStatus(Status.NON_URGENT);
                 productDAO.save(product);
-                System.out.println("Default product " + product.getName() + " has been created");
+                System.out.println("Default product '" + product.getName() + "' has been created with quantity " + product.getQuantity());
             }
         };
     }
