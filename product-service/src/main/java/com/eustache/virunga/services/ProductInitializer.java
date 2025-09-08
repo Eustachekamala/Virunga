@@ -21,7 +21,7 @@ public class ProductInitializer {
                 product.setDescription("description");
                 product.setCategory(Category.ELECTRICITY);
                 product.setTypeProduct(TypeProduct.NON_CONSUMABLE);
-                product.setQuantity(30);
+                product.setQuantity(4);
                 product.setStockAlertThreshold(DEFAULT_STOCK_ALERT_THRESHOLD);
                 product.setStatus(Status.NON_URGENT);
                 productDAO.save(product);
