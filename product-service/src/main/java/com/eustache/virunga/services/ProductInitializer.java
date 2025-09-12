@@ -27,16 +27,6 @@ public class ProductInitializer {
                 productDAO.save(product);
                 System.out.println("Default product '" + product.getName() + "' has been created with quantity " + product.getQuantity());
             }
-            if (productDAO.findByName("name2").isEmpty()) {
-                product.setName("Hummer");
-                product.setCategory(Category.PLUMBING);
-                product.setTypeProduct(TypeProduct.NON_CONSUMABLE);
-                product.setQuantity(45);
-                product.setStockAlertThreshold(DEFAULT_STOCK_ALERT_THRESHOLD);
-                product.setStatus(Status.NON_URGENT);
-                productDAO.save(product);
-                System.out.println("Default product 2 '" + product.getName() + "' has been created with quantity " + product.getQuantity());
-            }
         };
     }
 }
