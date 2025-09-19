@@ -15,7 +15,7 @@ interface Product {
     id: number;
     name: string;
     quantity: number;
-    status: 'ACTIVE' | 'INACTIVE';
+    status: 'URGENT' | 'NON_URGENT';
     typeProduct: 'CONSUMABLE' | 'NON_CONSUMABLE';
     category: string;
     description?: string;
@@ -33,7 +33,7 @@ const Products: React.FC = () => {
 
     const api = apiService();
 
-    // ✅ Fetch products with axios
+    // 🔹 Fetch products
     const { data: products = [], isLoading } = useQuery({
         queryKey: ['products'],
         queryFn: async (): Promise<Product[]> => {
@@ -42,7 +42,18 @@ const Products: React.FC = () => {
         },
     });
 
-    // ✅ Create product
+    // 🔹 Helper: Build FormData for backend
+    const buildFormData = (product: Partial<Product>, file?: File) => {
+        const formData = new FormData();
+        formData.append(
+            "product",
+            new Blob([JSON.stringify(product)], { type: "application/json" })
+        );
+        if (file) formData.append("imageFile", file);
+        return formData;
+    };
+
+    // 🔹 Create product
     const createProductMutation = useMutation({
         mutationFn: async (formData: FormData) => {
             const res = await api.post('/products/insert', formData, {
@@ -57,7 +68,7 @@ const Products: React.FC = () => {
         onError: () => toast.error('Failed to create product'),
     });
 
-    // ✅ Update product
+    // 🔹 Update product
     const updateProductMutation = useMutation({
         mutationFn: async ({ id, formData }: { id: number; formData: FormData }) => {
             const res = await api.patch(`/products/update/${id}`, formData, {
@@ -72,7 +83,7 @@ const Products: React.FC = () => {
         onError: () => toast.error('Failed to update product'),
     });
 
-    // ✅ Delete product
+    // 🔹 Delete product
     const deleteProductMutation = useMutation({
         mutationFn: async (productId: number) => {
             const res = await api.delete(`/products/${productId}`);
@@ -91,7 +102,35 @@ const Products: React.FC = () => {
         }
     };
 
-    // Filtering
+    // 🔹 Handle Add/Edit Submit
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const formDataObj = new FormData(form);
+
+        const productPayload: Partial<Product> = {
+            name: formDataObj.get("name") as string,
+            description: formDataObj.get("description") as string,
+            quantity: Number(formDataObj.get("quantity")),
+            typeProduct: formDataObj.get("typeProduct") as 'CONSUMABLE' | 'NON_CONSUMABLE',
+            status: formDataObj.get("status") as 'URGENT' | 'NON_URGENT',
+            category: formDataObj.get("category") as string,
+        };
+
+        const file = formDataObj.get("imageFile") as File | null;
+        const multipartData = buildFormData(productPayload, file ?? undefined);
+
+        if (editingProduct) {
+            updateProductMutation.mutate({ id: editingProduct.id, formData: multipartData });
+        } else {
+            createProductMutation.mutate(multipartData);
+        }
+
+        setShowAddModal(false);
+        setEditingProduct(null);
+    };
+
+    // 🔹 Filters
     const filteredProducts = products.filter((product) => {
         const matchesSearch =
             product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,21 +149,6 @@ const Products: React.FC = () => {
         status === 'ACTIVE'
             ? 'bg-green-100 text-green-800'
             : 'bg-gray-100 text-gray-800';
-
-    // Handle submit Add/Edit form
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-
-        if (editingProduct) {
-            updateProductMutation.mutate({ id: editingProduct.id, formData });
-        } else {
-            createProductMutation.mutate(formData);
-        }
-
-        setShowAddModal(false);
-        setEditingProduct(null);
-    };
 
     if (isLoading) {
         return (
@@ -358,10 +382,27 @@ const Products: React.FC = () => {
                                         <select
                                             name="status"
                                             className="input-field"
-                                            defaultValue={editingProduct?.status || 'ACTIVE'}
+                                            defaultValue={editingProduct?.status || ''}
                                         >
-                                            <option value="ACTIVE">Active</option>
-                                            <option value="INACTIVE">Inactive</option>
+                                            <option value="URGENT">URGENT</option>
+                                            <option value="NON_URGENT">NON_URGENT</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Category
+                                        </label>
+                                        <select
+                                            name="category"
+                                            className="input-field"
+                                            defaultValue={editingProduct?.category || ""}
+                                            required
+                                        >
+                                            <option value="" disabled>Select category</option>
+                                            <option value="ELECTRICITY">Electricity</option>
+                                            <option value="PLUMBING">Plumbing</option>
+                                            <option value="ELECTRONICS">Electronics</option>
                                         </select>
                                     </div>
 
