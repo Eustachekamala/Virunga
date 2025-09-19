@@ -44,7 +44,7 @@ class ProductServiceImplTest {
         productDTO = new ProductDTO(
                 "Test product",
                 10,
-                "Sample description",
+                "A test product description",
                 Status.NON_URGENT,
                 Category.ELECTRICITY,
                 TypeProduct.CONSUMABLE,

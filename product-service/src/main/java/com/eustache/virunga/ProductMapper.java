@@ -38,12 +38,12 @@ public class ProductMapper {
         // Set quantity; default to 0 if null
         product.setQuantity(productDTO.quantity() != null ? productDTO.quantity() : 0);
 
-        // Set stock alert threshold; default if not provided
-        product.setStockAlertThreshold(
-                productDTO.stockAlertThreshold() != null
-                        ? productDTO.stockAlertThreshold()
-                        : DEFAULT_STOCK_ALERT_THRESHOLD
-        );
+//        // Set stock alert threshold; default if not provided
+//        product.setStockAlertThreshold(
+//                productDTO.stockAlertThreshold() != null
+//                        ? productDTO.stockAlertThreshold()
+//                        : DEFAULT_STOCK_ALERT_THRESHOLD
+//        );
         product.setStockAlertThreshold(productDTO.quantity());
         product.setStatus(productDTO.status());
         product.setCategory(productDTO.category());

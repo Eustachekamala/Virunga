@@ -4,15 +4,15 @@ import com.eustache.virunga.model.Category;
 import com.eustache.virunga.model.Status;
 import com.eustache.virunga.model.TypeProduct;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
 public record ProductDTO(
         @NotBlank(message = "Name is required")
         String name,
-        @NotBlank(message = "Quantity is required")
+        @NotNull(message = "Quantity is required")
         Integer quantity,
-        Integer stockAlertThreshold,
         String description,
         Status status,
         Category category,

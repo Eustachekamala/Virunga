@@ -26,10 +26,10 @@ public class ProductController {
 
     @PostMapping(value = "insert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> createProduct(
-            @ModelAttribute ProductDTO productDTO,
-            @RequestParam("imageFile") MultipartFile image
+            @RequestPart("product") ProductDTO productDTO,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ){
-        return productService.createProduct(productDTO, image);
+        return productService.createProduct(productDTO, imageFile);
     }
 
     @GetMapping("type/{consumable}")
@@ -49,10 +49,10 @@ public class ProductController {
     @PatchMapping("update/{id}")
     public ResponseEntity<String> updateProduct(
             @PathVariable Integer id,
-            @ModelAttribute ProductDTO  productDTO,
-            @RequestParam("imageFile")  MultipartFile image
+            @RequestPart("product") ProductDTO productDTO,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
     ){
-        return productService.updateProduct(id, productDTO, image);
+        return productService.updateProduct(id, productDTO, imageFile);
     }
 
     @GetMapping("getByName/{name}")

@@ -18,7 +18,7 @@ public class ProductInitializer {
             Product product = new Product();
             if (productDAO.findByName("name").isEmpty()) {
                 product.setName("Screw Driver");
-                product.setDescription("description");
+                product.setDescription("This tool is used to drive screws into various materials.");
                 product.setCategory(Category.ELECTRICITY);
                 product.setTypeProduct(TypeProduct.NON_CONSUMABLE);
                 product.setQuantity(4);
@@ -26,6 +26,18 @@ public class ProductInitializer {
                 product.setStatus(Status.NON_URGENT);
                 productDAO.save(product);
                 System.out.println("Default product '" + product.getName() + "' has been created with quantity " + product.getQuantity());
+            }
+            Product product2 = new Product();
+            if (productDAO.findByName("Hammer").isEmpty()) {
+                product2.setName("Hammer");
+                product2.setDescription("This tool is used for driving nails into, or pulling nails from, some other object.");
+                product2.setCategory(Category.ELECTRICITY);
+                product2.setTypeProduct(TypeProduct.NON_CONSUMABLE);
+                product2.setQuantity(10);
+                product2.setStockAlertThreshold(DEFAULT_STOCK_ALERT_THRESHOLD);
+                product2.setStatus(Status.NON_URGENT);
+                productDAO.save(product2);
+                System.out.println("Default product '" + product2.getName() + "' has been created with quantity " + product2.getQuantity());
             }
         };
     }
