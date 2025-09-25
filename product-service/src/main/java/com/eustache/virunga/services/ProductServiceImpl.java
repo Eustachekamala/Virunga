@@ -93,6 +93,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<String> deleteProduct(Integer id) {
         try {
+            if (!productDAO.existsById(id)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found with id " + id);
+            }
             productDAO.deleteById(id);
             log.info("Product deleted: {}", id);
             return new ResponseEntity<>("Product deleted successfully", HttpStatus.OK);

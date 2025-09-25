@@ -4,11 +4,13 @@ import com.eustache.virunga.DTO.ProductDTO;
 import com.eustache.virunga.DTO.ProductResponseDTO;
 import com.eustache.virunga.model.Product;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
 
 @Component
 public class ProductMapper {
     private static final int DEFAULT_STOCK_ALERT_THRESHOLD = 5;
+
     public ProductResponseDTO toDto(Product product) {
         if (product == null) return null;
 
@@ -31,27 +33,31 @@ public class ProductMapper {
         );
     }
 
-    public Product toEntity(ProductDTO productDTO,  String image) {
-        if (productDTO == null) return null;
+    public Product toEntity(ProductDTO productDTO, String image) {
+        if (productDTO == null) {
+            // Toujours retourner un objet, jamais null → évite les NPE
+            Product emptyProduct = new Product();
+            emptyProduct.setQuantity(0);
+            emptyProduct.setStockAlertThreshold(DEFAULT_STOCK_ALERT_THRESHOLD);
+            emptyProduct.setCreatedAt(LocalDate.now());
+            emptyProduct.setUpdatedAt(LocalDate.now());
+            emptyProduct.setImageFile(image);
+            return emptyProduct;
+        }
+
         Product product = new Product();
         product.setName(productDTO.name());
-        // Set quantity; default to 0 if null
         product.setQuantity(productDTO.quantity() != null ? productDTO.quantity() : 0);
-
-//        // Set stock alert threshold; default if not provided
-//        product.setStockAlertThreshold(
-//                productDTO.stockAlertThreshold() != null
-//                        ? productDTO.stockAlertThreshold()
-//                        : DEFAULT_STOCK_ALERT_THRESHOLD
-//        );
-        product.setStockAlertThreshold(productDTO.quantity());
+        product.setStockAlertThreshold(
+                productDTO.quantity() != null ? productDTO.quantity() : DEFAULT_STOCK_ALERT_THRESHOLD
+        );
         product.setStatus(productDTO.status());
         product.setCategory(productDTO.category());
         product.setImageFile(image);
         product.setDescription(productDTO.description());
         product.setTypeProduct(productDTO.typeProduct());
-        product.setCreatedAt(productDTO.createdAt());
-        product.setUpdatedAt(productDTO.updatedAt());
+        product.setCreatedAt(productDTO.createdAt() != null ? productDTO.createdAt() : LocalDate.now());
+        product.setUpdatedAt(productDTO.updatedAt() != null ? productDTO.updatedAt() : LocalDate.now());
         return product;
     }
 }
