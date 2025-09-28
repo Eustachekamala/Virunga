@@ -1,12 +1,10 @@
 FROM openjdk:21-jdk-slim
 
-LABEL authors="eustache"
-
 WORKDIR /virungaApp
 
-COPY target/virunga-0.0.1-SNAPSHOT.jar virunga.jar
+COPY target/virunga-0.0.1-SNAPSHOT.jar virungaApp.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "virunga.jar"]
+ENTRYPOINT ["java", "-jar", "virungaApp.jar"]
 

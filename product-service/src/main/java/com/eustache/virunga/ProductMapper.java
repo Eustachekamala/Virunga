@@ -56,8 +56,8 @@ public class ProductMapper {
         product.setImageFile(image);
         product.setDescription(productDTO.description());
         product.setTypeProduct(productDTO.typeProduct());
-        product.setCreatedAt(productDTO.createdAt() != null ? productDTO.createdAt() : LocalDate.now());
-        product.setUpdatedAt(productDTO.updatedAt() != null ? productDTO.updatedAt() : LocalDate.now());
+        product.setCreatedAt(LocalDate.now());
+        product.setUpdatedAt(LocalDate.now());
         return product;
     }
 }

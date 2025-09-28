@@ -16,8 +16,6 @@ public record ProductDTO(
         String description,
         Status status,
         Category category,
-        TypeProduct typeProduct,
-        LocalDate createdAt,
-        LocalDate updatedAt
+        TypeProduct typeProduct
 ) {
 }

@@ -8,9 +8,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-@RestController
-@RequestMapping("/auth")
-@RequiredArgsConstructor
+//@RestController
+//@RequestMapping("/auth")
+//@RequiredArgsConstructor
 public class LoginController {
 
     @Value("${spring.security.oauth2.client.provider.keycloak.token-uri}")
