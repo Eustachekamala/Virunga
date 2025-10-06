@@ -2,12 +2,12 @@ pipeline {
   agent any
 
   tools {
-  maven 'Maven-3.9.11'
-  jdk 'JDK-17'
+	maven 'Maven-3.9.11'
+        jdk 'jdk-21'
   }
-
+  
   stages {
-    state('Build Maven'){
+    stage('Build Maven'){
         environment {
           DATASOURCE_URL = "jdbc:postgresql://ep-curly-mouse-adatc3x8-pooler.c-2.us-east-1.aws.neon.tech/product-virunga-DB"
         }
@@ -30,13 +30,13 @@ pipeline {
         }
     }
 
-    state('Build Docker Image') {
+    stage('Build Docker Image') {
         steps {
             sh 'cd product-service && docker build -t eustachekamala/virunga-product-app .'
         }
     }
 
-    state('Push Docker Image to Docker Hub'){
+    stage('Push Docker Image to Docker Hub'){
         steps {
             withCredentials([
                 usernamePassword(
