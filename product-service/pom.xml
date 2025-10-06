@@ -151,6 +151,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
+        <finalName>virunga-app</finalName>
 	</build>
-
 </project>
