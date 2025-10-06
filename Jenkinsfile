@@ -9,7 +9,7 @@ pipeline {
   stages {
     state('Build Maven'){
         environment {
-          DATASOURCE_URL=jdbc:postgresql://ep-curly-mouse-adatc3x8-pooler.c-2.us-east-1.aws.neon.tech/product-virunga-DB
+          DATASOURCE_URL = "jdbc:postgresql://ep-curly-mouse-adatc3x8-pooler.c-2.us-east-1.aws.neon.tech/product-virunga-DB"
         }
         steps {
             checkout scmGit(
