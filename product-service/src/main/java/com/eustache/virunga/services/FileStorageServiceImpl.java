@@ -13,6 +13,7 @@ import java.nio.file.StandardCopyOption;
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
 
+    @SuppressWarnings("null")
     @Override
     public String saveImage(MultipartFile file) throws IOException {
         if (file.isEmpty()) {

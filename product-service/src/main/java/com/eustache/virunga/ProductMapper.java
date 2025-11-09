@@ -51,7 +51,6 @@ public class ProductMapper {
         product.setStockAlertThreshold(
                 productDTO.quantity() != null ? productDTO.quantity() : DEFAULT_STOCK_ALERT_THRESHOLD
         );
-        product.setStatus(productDTO.status());
         product.setCategory(productDTO.category());
         product.setImageFile(image);
         product.setDescription(productDTO.description());

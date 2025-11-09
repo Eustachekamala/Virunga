@@ -2,24 +2,24 @@ package com.eustache.virunga.services;
 
 import com.eustache.virunga.DTO.ProductDTO;
 import com.eustache.virunga.DTO.ProductResponseDTO;
-import com.eustache.virunga.ProductDAO;
 import com.eustache.virunga.ProductMapper;
+import com.eustache.virunga.DAO.ProductDAO;
 import com.eustache.virunga.model.Product;
 import com.eustache.virunga.model.Status;
 import com.eustache.virunga.model.TypeProduct;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.eustache.virunga.utils.UpdateUtil.setNotNull;
 
 @Service
 @RequiredArgsConstructor
@@ -33,11 +33,11 @@ public class ProductServiceImpl implements ProductService {
     private static final int DEFAULT_STOCK_ALERT_THRESHOLD = 5;
 
     @Override
-    public ResponseEntity<String> createProduct(ProductDTO productDTO, MultipartFile imageFile) {
+    public ResponseEntity<String> createProduct(ProductDTO productDTO) {
         try {
             String imagePath = null;
-            if (imageFile != null && !imageFile.isEmpty()) {
-                imagePath = fileStorageService.saveImage(imageFile);
+            if (productDTO.imagFile() != null && !productDTO.imagFile().isEmpty()) {
+                imagePath = fileStorageService.saveImage(productDTO.imagFile());
             }
 
             Product product = productMapper.toEntity(productDTO, imagePath);
@@ -57,21 +57,21 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO, MultipartFile imageFile) {
+    public ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO) {
         try {
             Product existingProduct = productDAO.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
 
-            setNotNull(productDTO.name(), existingProduct::setName);
-            setNotNull(productDTO.description(), existingProduct::setDescription);
-            setNotNull(productDTO.category(), existingProduct::setCategory);
-            setNotNull(productDTO.typeProduct(), existingProduct::setTypeProduct);
-            setNotNull(productDTO.status(), existingProduct::setStatus);
-            setNotNull(productDTO.quantity(), existingProduct::setQuantity);
+            Optional.ofNullable(productDTO.name()).ifPresent(existingProduct::setName);
+            Optional.ofNullable(productDTO.category()).ifPresent(existingProduct::setCategory);
+            Optional.ofNullable(productDTO.description()).ifPresent(existingProduct::setDescription);
+            Optional.ofNullable(productDTO.quantity()).ifPresent(existingProduct::setQuantity);
+            Optional.ofNullable(productDTO.typeProduct()).ifPresent(existingProduct::setTypeProduct);
 
-            if (imageFile != null && !imageFile.isEmpty()) {
-                String newImageFile = fileStorageService.saveImage(imageFile);
-                existingProduct.setImageFile(newImageFile);
+
+            if (productDTO.imagFile() != null && !productDTO.imagFile().isEmpty()) {
+                String newImageFile = fileStorageService.saveImage(productDTO.imagFile());
+                Optional.ofNullable(newImageFile).ifPresent(existingProduct::setImageFile);
             }
 
             //To update the status
@@ -148,27 +148,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<List<ProductResponseDTO>> getProductByConsumable(String consumable) {
-        return getListResponseEntity(consumable);
-    }
-
-    @Override
-    public ResponseEntity<List<ProductResponseDTO>> getProductByNoConsumable(String noConsumable) {
-        return getListResponseEntity(noConsumable);
-    }
-
-    private ResponseEntity<List<ProductResponseDTO>> getListResponseEntity(String type) {
+    public ResponseEntity<List<ProductResponseDTO>> getProductsByType(TypeProduct type) {
         try {
-            List<ProductResponseDTO> products = productDAO.findProductByTypeProduct(TypeProduct.valueOf(type))
+            List<ProductResponseDTO> products = productDAO.findByTypeProduct(type)
                     .stream()
                     .map(productMapper::toDto)
                     .collect(Collectors.toList());
             return new ResponseEntity<>(products, HttpStatus.OK);
         } catch (Exception ex) {
-            log.error("Failed to fetch products by type: {}", ex.getMessage(), ex);
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+            log.error("Failed to fetch products by type {}: {}", type, ex.getMessage(), ex);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @Override
     public ResponseEntity<List<ProductResponseDTO>> getLowStockProducts() {
