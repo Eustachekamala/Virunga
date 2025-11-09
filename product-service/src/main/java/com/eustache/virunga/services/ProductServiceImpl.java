@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,13 @@ public class ProductServiceImpl implements ProductService {
 
     private static final int DEFAULT_STOCK_ALERT_THRESHOLD = 5;
 
+    /**
+     * Creates a new product in the system.
+     * 
+     * @param productDTO The product data transfer object containing the product information
+     * @return ResponseEntity containing a success message and HTTP status CREATED if successful,
+     *         or an error message and HTTP status INTERNAL_SERVER_ERROR if creation fails
+     */
     @Override
     public ResponseEntity<String> createProduct(ProductDTO productDTO) {
         try {
@@ -56,6 +64,14 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    /**
+     * Updates an existing product in the system.
+     * 
+     * @param id The ID of the product to update
+     * @param productDTO The product data transfer object containing the updated product information
+     * @return ResponseEntity containing a success message and HTTP status OK if successful,
+     *         or an error message and HTTP status BAD_REQUEST if update fails
+     */
     @Override
     public ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO) {
         try {
@@ -90,6 +106,13 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    /**
+     * Deletes a product from the system.
+     * 
+     * @param id The ID of the product to delete
+     * @return ResponseEntity containing a success message and HTTP status OK if successful,
+     *         or an error message and HTTP status NOT_FOUND if the product doesn't exist
+     */
     @Override
     public ResponseEntity<String> deleteProduct(Integer id) {
         try {
@@ -105,6 +128,12 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    /**
+     * Retrieves all products from the system.
+     * 
+     * @return ResponseEntity containing a list of ProductResponseDTO and HTTP status OK,
+     *         returns an empty list if no products are found
+     */
     @Override
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
         try {
@@ -119,6 +148,13 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    /**
+     * Retrieves a product by its ID.
+     * 
+     * @param id The ID of the product to retrieve
+     * @return ResponseEntity containing the ProductResponseDTO and HTTP status OK if found,
+     *         or HTTP status NOT_FOUND if the product doesn't exist
+     */
     @Override
     public ResponseEntity<ProductResponseDTO> getProductById(Integer id) {
         try {
@@ -133,6 +169,13 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    /**
+     * Retrieves products by their name.
+     * 
+     * @param name The name of the products to search for
+     * @return ResponseEntity containing a list of matching ProductResponseDTO and HTTP status OK,
+     *         returns an empty list if no products are found
+     */
     @Override
     public ResponseEntity<List<ProductResponseDTO>> getProductByName(String name) {
         try {
@@ -147,6 +190,13 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    /**
+     * Retrieves products by their type.
+     * 
+     * @param type The type of products to retrieve
+     * @return ResponseEntity containing a list of matching ProductResponseDTO and HTTP status OK,
+     *         or an empty list and HTTP status INTERNAL_SERVER_ERROR if the operation fails
+     */
     @Override
     public ResponseEntity<List<ProductResponseDTO>> getProductsByType(TypeProduct type) {
         try {
@@ -162,6 +212,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
+    /**
+     * Retrieves all products that are low on stock (quantity <= stock alert threshold).
+     * 
+     * @return ResponseEntity containing a list of low stock ProductResponseDTO and HTTP status OK,
+     *         returns an empty list if no low stock products are found
+     */
     @Override
     public ResponseEntity<List<ProductResponseDTO>> getLowStockProducts() {
         try {
@@ -183,12 +239,23 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Helper method to log low stock for a single product
+    /**
+     * Helper method to check and log if a product is low on stock.
+     * 
+     * @param product The product to check for low stock
+     */
     private void checkAndLogLowStock(Product product) {
         if (product.getQuantity() != null && product.getQuantity() <= product.getStockAlertThreshold()) {
             log.warn("Product '{}' is low on stock! Current quantity: {}", product.getName(), product.getQuantity());
         }
     }
 
+    /**
+     * Updates the status of a product based on its current quantity and stock alert threshold.
+     * Sets status to URGENT if quantity is below or equal to threshold, NON_URGENT otherwise.
+     * 
+     * @param product The product to update the status for
+     */
     private void updateProductStatus(Product product) {
         if (product.getQuantity() != null && product.getStockAlertThreshold() != null) {
             if (product.getQuantity() <= product.getStockAlertThreshold()) {
@@ -202,12 +269,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    @Scheduled(fixedRate = 60000) // every 1 minute
+    /**
+     * Scheduled task that runs every 12 hours to check and update the status of all products
+     * based on their current stock levels. This method runs asynchronously.
+     */
+    @Async
+    @Scheduled(cron = "0 0 */12 * * *") // every 12 hours
     public void scheduledLowStockCheck() {
+        log.info("Running scheduled low stock check...");
         productDAO.findAll().forEach(product -> {
             updateProductStatus(product);
             productDAO.save(product);
         });
+        log.info("Low stock check completed.");
     }
 
 }
