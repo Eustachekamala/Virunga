@@ -1,5 +1,5 @@
 # OpenJDK 21 image
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk
 
 # Working directory
 WORKDIR /virungaApp
