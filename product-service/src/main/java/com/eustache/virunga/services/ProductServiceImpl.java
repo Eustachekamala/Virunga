@@ -10,6 +10,8 @@ import com.eustache.virunga.model.TypeProduct;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -55,7 +57,15 @@ public class ProductServiceImpl implements ProductService {
             product.setStockAlertThreshold(DEFAULT_STOCK_ALERT_THRESHOLD);
             //To update the status
             updateProductStatus(product);
-            productDAO.save(product);
+            
+            // This will handle duplicate product names
+            try {
+                productDAO.save(product);
+            } catch (DataIntegrityViolationException e) {
+                log.error("Product already exists: {}", product.getName());
+                return new ResponseEntity<>("Product already exists: " + product.getName(), HttpStatus.CONFLICT);
+            }
+
             log.info("Product created: {}", product);
             return new ResponseEntity<>("Product created successfully", HttpStatus.CREATED);
 
