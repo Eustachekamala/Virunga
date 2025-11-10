@@ -80,3 +80,11 @@ This interface allows you to explore and test all REST endpoints interactively.
 - App URL: [Virunga Product App](https://virunga-product-app.onrender.com)
 - Swagger UI: [API Documentation](https://virunga-product-app.onrender.com/api/v1/swagger-ui/index.html#/)
 - Docker Image: `eustachekamala/virunga-product-app`
+
+## Low-stock email alerts (what was added)
+
+This project includes a simple email notification feature in the `product-service` that sends an alert to the administrator when one or more products are below their configured stock threshold.
+
+- EmailService: a small service that sends plain-text notification emails via Spring's `JavaMailSender` (used by the low-stock scheduler)
+
+- LowStockScheduler: a scheduled task that runs every 12 hours to check for products below the stock threshold and sends email alerts using the EmailService.
