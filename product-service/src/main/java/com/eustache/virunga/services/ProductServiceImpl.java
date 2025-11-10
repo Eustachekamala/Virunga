@@ -30,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ProductDAO productDAO;
     private final FileStorageService fileStorageService;
+    private final EmailService emailService;
 
     private static final int DEFAULT_STOCK_ALERT_THRESHOLD = 5;
 
@@ -275,13 +276,40 @@ public class ProductServiceImpl implements ProductService {
      */
     @Async
     @Scheduled(cron = "0 0 */12 * * *") // every 12 hours
+    // @Scheduled(cron = "0 * * * * *") // every 1 minute
     public void scheduledLowStockCheck() {
         log.info("Running scheduled low stock check...");
-        productDAO.findAll().forEach(product -> {
-            updateProductStatus(product);
-            productDAO.save(product);
-        });
+
+        var lowStockProducts = productDAO.findAll().stream()
+                .peek(this::updateProductStatus) // update each product's status
+                .map(productDAO::save)           // save updated status
+                .filter(p -> p.getQuantity() <= p.getStockAlertThreshold())
+                .toList();
+
+        // If there are low-stock products, send an email alert
+        if (!lowStockProducts.isEmpty()) {
+            StringBuilder message = new StringBuilder("⚠️ Low Stock Alert!\n\nThe following products are below their stock threshold:\n\n");
+
+            lowStockProducts.forEach(p -> message.append(String.format(
+                    "• %s — Qty: %d (Threshold: %d)\n",
+                    p.getName(),
+                    p.getQuantity(),
+                    p.getStockAlertThreshold()
+            )));
+
+            message.append("\nPlease restock these items as soon as possible.");
+
+            emailService.sendEmail(
+                    "eustachekamala.dev@gmail.com",
+                    "Stock Alert: Low Inventory Detected",
+                    message.toString()
+            );
+
+            log.warn("Low stock alert email sent to admin. Products: {}", lowStockProducts.size());
+        }
+
         log.info("Low stock check completed.");
     }
+
 
 }
