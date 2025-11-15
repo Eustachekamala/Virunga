@@ -286,7 +286,6 @@ public class ProductServiceImpl implements ProductService {
      */
     @Async
     @Scheduled(cron = "0 0 */12 * * *") // every 12 hours
-    // @Scheduled(cron = "0 * * * * *") // every 1 minute
     public void scheduledLowStockCheck() {
         log.info("Running scheduled low stock check...");
 
@@ -298,7 +297,7 @@ public class ProductServiceImpl implements ProductService {
 
         // If there are low-stock products, send an email alert
         if (!lowStockProducts.isEmpty()) {
-            StringBuilder message = new StringBuilder("⚠️ Low Stock Alert!\n\nThe following products are below their stock threshold:\n\n");
+            StringBuilder message = new StringBuilder("Low Stock Alert!\n\nThe following products are below their stock threshold:\n\n");
 
             lowStockProducts.forEach(p -> message.append(String.format(
                     "• %s — Qty: %d (Threshold: %d)\n",
