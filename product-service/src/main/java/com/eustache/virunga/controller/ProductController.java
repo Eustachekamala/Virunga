@@ -20,19 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("products")
+@RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
-@Tag(
-        name = "Product Controller",
-        description = "Controller for managing products"
-)
+@Tag(name = "Product Controller", description = "Controller for managing products")
 public class ProductController {
     private final ProductServiceImpl productService;
 
     @Operation(summary = "Get all products")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
-        @ApiResponse(responseCode = "404", description = "No product found")
+            @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No product found")
     })
     @GetMapping("allProducts")
     public ResponseEntity<List<ProductResponseDTO>> getAll() {
@@ -41,25 +38,23 @@ public class ProductController {
 
     @Operation(summary = "Insert a new product")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Created successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid data")
+            @ApiResponse(responseCode = "201", description = "Created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid data")
     })
     @PostMapping(value = "insert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> createProduct(
-            @ModelAttribute ProductDTO productDTO
-    ){
+            @ModelAttribute ProductDTO productDTO) {
         return productService.createProduct(productDTO);
     }
 
     @Operation(summary = "Get Products by type")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid type supplied")
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid type supplied")
     })
     @GetMapping("type/{type}")
     public ResponseEntity<List<ProductResponseDTO>> getProductsByType(
-            @PathVariable String type
-    ) {
+            @PathVariable String type) {
         TypeProduct typeEnum;
         try {
             typeEnum = TypeProduct.valueOf(type.toUpperCase());
@@ -69,64 +64,58 @@ public class ProductController {
         return productService.getProductsByType(typeEnum);
     }
 
-
     @Operation(summary = "Get Products with low stocks")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Product fetched successfully"),
-        @ApiResponse(responseCode = "404", description = "Products with no found")
+            @ApiResponse(responseCode = "200", description = "Product fetched successfully"),
+            @ApiResponse(responseCode = "404", description = "Products with no found")
     })
     @GetMapping("lowStock")
-    public ResponseEntity<List<ProductResponseDTO>> getLowProductStocks(){
+    public ResponseEntity<List<ProductResponseDTO>> getLowProductStocks() {
         return productService.getLowStockProducts();
     }
 
-
     @Operation(summary = "Update a product")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Updated successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid data")
+            @ApiResponse(responseCode = "201", description = "Updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid data")
     })
     @PatchMapping("update/{id}")
     public ResponseEntity<String> updateProduct(
             @PathVariable Integer id,
-            @ModelAttribute ProductDTO productDTO
-    ){
+            @ModelAttribute ProductDTO productDTO) {
         return productService.updateProduct(id, productDTO);
     }
 
     @Operation(summary = "Filter product by name")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
-        @ApiResponse(responseCode = "404", description = "Non product was found")
+            @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Non product was found")
     })
     @GetMapping("getByName/{name}")
     public ResponseEntity<List<ProductResponseDTO>> getProductByName(
-            @PathVariable String name
-    ){
+            @PathVariable String name) {
         return productService.getProductByName(name);
     }
 
     @Operation(summary = "Get product by ID")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
-        @ApiResponse(responseCode = "404", description = "Non product was found")
+            @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Non product was found")
     })
     @GetMapping("getById/{id}")
     public ResponseEntity<ProductResponseDTO> getProductById(
-            @PathVariable Integer id
-    ){
+            @PathVariable Integer id) {
         return productService.getProductById(id);
     }
 
     @Operation(summary = "Delete a product")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Product was deleted successfully"),
-        @ApiResponse(responseCode = "404", description = "Non product was found")
+            @ApiResponse(responseCode = "200", description = "Product was deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Non product was found")
     })
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteProductById(
-            @PathVariable Integer id
-    ){
+            @PathVariable Integer id) {
         return productService.deleteProduct(id);
     }
 }

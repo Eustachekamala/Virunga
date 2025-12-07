@@ -20,14 +20,14 @@ public class FileStorageServiceImpl implements FileStorageService {
             throw new IOException("Cannot upload empty file");
         }
 
-        //Ensure the upload directory exists
+        // Ensure the upload directory exists
         String uploadDir = "src/main/resources/uploads/";
         File directory = new File(uploadDir);
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
-        //Save file with a unique name
+        // Save file with a unique name
         String fileName = file.getOriginalFilename();
         Path filePath = Paths.get(uploadDir + fileName);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
