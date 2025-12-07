@@ -50,8 +50,8 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<String> createProduct(ProductDTO productDTO) {
         try {
             String imagePath = null;
-            if (productDTO.imagFile() != null && !productDTO.imagFile().isEmpty()) {
-                imagePath = fileStorageService.saveImage(productDTO.imagFile());
+            if (productDTO.imageFile() != null && !productDTO.imageFile().isEmpty()) {
+                imagePath = fileStorageService.saveImage(productDTO.imageFile());
             }
 
             Product product = productMapper.toEntity(productDTO, imagePath);
@@ -93,32 +93,48 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO) {
         try {
             Product existingProduct = productDAO.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id)); // A
 
+            // B: Safe update logic using Optional
             Optional.ofNullable(productDTO.name()).ifPresent(existingProduct::setName);
             Optional.ofNullable(productDTO.category()).ifPresent(existingProduct::setCategory);
             Optional.ofNullable(productDTO.description()).ifPresent(existingProduct::setDescription);
             Optional.ofNullable(productDTO.quantity()).ifPresent(existingProduct::setQuantity);
             Optional.ofNullable(productDTO.typeProduct()).ifPresent(existingProduct::setTypeProduct);
 
-            if (productDTO.imagFile() != null && !productDTO.imagFile().isEmpty()) {
-                String newImageFile = fileStorageService.saveImage(productDTO.imagFile());
+            // C: Image file handling
+            if (productDTO.imageFile() != null && !productDTO.imageFile().isEmpty()) {
+                String newImageFile = fileStorageService.saveImage(productDTO.imageFile());
+                // It is VITAL that newImageFile is not null/invalid here.
+                // If saveImage throws an exception, it goes to the catch block.
                 Optional.ofNullable(newImageFile).ifPresent(existingProduct::setImageFile);
             }
 
-            // To update the status
+            // D: To update the status and save
             updateProductStatus(existingProduct);
             productDAO.save(existingProduct);
+            
             log.info("Product updated: {}", existingProduct);
-
-            // Check stock alert
             checkAndLogLowStock(existingProduct);
 
             return new ResponseEntity<>("Product updated successfully", HttpStatus.OK);
 
+        } catch (IllegalArgumentException ex) {
+            // Handles case A: Product not found
+            log.error("Product not found: {}", ex.getMessage());
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404
+            
+        } catch (DataIntegrityViolationException ex) {
+            // Handles case E: Duplicate name, etc.
+            log.error("Data integrity violation during update: {}", ex.getMessage());
+            return new ResponseEntity<>("Update failed: A field violates a unique constraint (e.g., duplicate name).", HttpStatus.CONFLICT); // Return 409
+            
         } catch (Exception ex) {
-            log.error("Failed to update product: {}", ex.getMessage(), ex);
-            return new ResponseEntity<>("Product not updated", HttpStatus.BAD_REQUEST);
+            // Handles all other unexpected errors (e.g., file system failure in saveImage)
+            log.error("Unexpected failure to update product: {}", ex.getMessage(), ex);
+            // We will return a 400 because the client's request might be malformed, 
+            // but the core server issue is logged as an ERROR.
+            return new ResponseEntity<>("Update failed due to server processing error.", HttpStatus.BAD_REQUEST);
         }
     }
 

@@ -15,6 +15,6 @@ public record ProductDTO(
         String description,
         Category category,
         TypeProduct typeProduct,
-        MultipartFile imagFile
+        MultipartFile imageFile
 ) {
 }
