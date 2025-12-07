@@ -38,6 +38,6 @@ export interface CreateProductDTO {
     description: string;
     category: Category;
     typeProduct: TypeProduct;
-    imagFile?: File;
+    imageFile?: File;
 }
 

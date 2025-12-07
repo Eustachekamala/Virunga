@@ -130,7 +130,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
         e.preventDefault();
         setLoading(true);
         try {
-            await onSubmit({ ...formData, imagFile: file || undefined });
+            await onSubmit({ ...formData, imageFile: file || undefined });
             onClose();
         } catch (error) {
             console.error('Failed to save product', error);
