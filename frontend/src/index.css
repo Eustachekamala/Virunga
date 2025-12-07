@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+    --color-cocoa: #2C1810;
+    --color-cocoa-light: #4A3728;
+    --color-cream: #FDFBF7;
+    --color-cream-dark: #EFEBE0;
+    --color-forest: #2D4F1E;
+    --color-forest-light: #4A6E3A;
+    --color-gold: #D4AF37;
+    --color-soil: #5D4037;
+}
+
+@layer base {
+    body {
+        @apply bg-cream text-cocoa antialiased;
+    }
+}
