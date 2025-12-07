@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { TypeProduct } from '../types';
+import { TypeProduct, Category } from '../types';
 import type { CreateProductDTO, Product } from '../types';
 
 const API_BASE_URL = '/api/v1/products';
@@ -39,8 +39,13 @@ export const getProductsByType = async (type: TypeProduct): Promise<Product[]> =
     return response.data;
 };
 
+export const getProductsByCategory = async (category: Category): Promise<Product[]> => {
+    const response = await api.get(`${API_BASE_URL}/category/${category}`);
+    return response.data;
+};
+
 export const getLowStockProducts = async (): Promise<Product[]> => {
-    const response = await api.get(`${API_BASE_URL}/lowStock`);
+    const response = await api.get(`${API_BASE_URL}/low-stock`);
     return response.data;
 };
 

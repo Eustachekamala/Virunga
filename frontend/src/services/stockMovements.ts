@@ -71,15 +71,15 @@ export const addStockExit = async (exit: Omit<StockMovement, 'id' | 'type' | 'pr
 };
 
 // Filter movements
-export const filterMovements = (filter: MovementFilter): StockMovement[] => {
-    let movements = getMovements();
+export const filterMovements = (movements: StockMovement[], filter: MovementFilter): StockMovement[] => {
 
     if (filter.startDate && filter.endDate) {
-        const start = new Date(filter.startDate);
-        const end = new Date(filter.endDate);
-        movements = movements.filter(m =>
-            isWithinInterval(new Date(m.date), { start, end })
-        );
+        movements = movements.filter(m => {
+            const movementDate = new Date(m.date);
+            const start = new Date(filter.startDate!);
+            const end = new Date(filter.endDate!);
+            return movementDate >= start && movementDate <= end;
+        });
     }
 
     if (filter.productId) {
@@ -115,7 +115,7 @@ export const getDailySummary = (date: Date = new Date()): DailySummary => {
     const start = startOfDay(date);
     const end = endOfDay(date);
 
-    const movements = filterMovements({
+    const movements = filterMovements(getMovements(), {
         startDate: start.toISOString(),
         endDate: end.toISOString(),
     });
@@ -137,7 +137,7 @@ export const getWeeklySummary = (date: Date = new Date()): WeeklySummary => {
     const start = startOfWeek(date, { weekStartsOn: 1 }); // Monday
     const end = endOfWeek(date, { weekStartsOn: 1 }); // Sunday
 
-    const movements = filterMovements({
+    const movements = filterMovements(getMovements(), {
         startDate: start.toISOString(),
         endDate: end.toISOString(),
     });

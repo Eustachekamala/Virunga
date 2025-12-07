@@ -1,6 +1,6 @@
-import { NavLink, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { getLowStockProducts } from '../services/api';
+import { NavLink } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useProductStore } from '../stores';
 import {
     LayoutDashboard,
     Package,
@@ -14,21 +14,11 @@ import {
 } from 'lucide-react';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-    const [lowStockCount, setLowStockCount] = useState(0);
-    const navigate = useNavigate();
+    const { lowStockProducts, fetchLowStockProducts } = useProductStore();
 
     useEffect(() => {
-        fetchLowStockCount();
-    }, []);
-
-    const fetchLowStockCount = async () => {
-        try {
-            const data = await getLowStockProducts();
-            setLowStockCount(data.length);
-        } catch (error) {
-            console.error('Failed to fetch low stock count', error);
-        }
-    };
+        fetchLowStockProducts();
+    }, [fetchLowStockProducts]);
 
     return (
         <div className="flex h-screen bg-gradient-to-br from-cream via-white to-cream/50">
@@ -47,7 +37,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     <NavItem to="/" exact icon={<LayoutDashboard className="w-5 h-5" />}>
                         Dashboard
                     </NavItem>
-                    <NavItem to="/inventory" badge={lowStockCount} icon={<Package className="w-5 h-5" />}>
+                    <NavItem to="/inventory" badge={lowStockProducts.length} icon={<Package className="w-5 h-5" />}>
                         Inventory
                     </NavItem>
 

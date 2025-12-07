@@ -7,10 +7,11 @@ import {
     getProducts,
     getProductByName,
     getProductsByType,
+    getProductsByCategory,
     getLowStockProducts,
     updateProduct
 } from '../services/api';
-import { TypeProduct } from '../types';
+import { TypeProduct, Category } from '../types';
 import type { CreateProductDTO, Product } from '../types';
 
 const Inventory = () => {
@@ -22,6 +23,7 @@ const Inventory = () => {
     // Filters state
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedType, setSelectedType] = useState<TypeProduct | 'ALL'>('ALL');
+    const [selectedCategory, setSelectedCategory] = useState<Category | 'ALL'>('ALL');
     const [viewMode, setViewMode] = useState<'ALL' | 'LOW_STOCK'>('ALL');
 
     const fetchProducts = async () => {
@@ -35,6 +37,8 @@ const Inventory = () => {
                 data = await getProductByName(searchQuery);
             } else if (selectedType !== 'ALL') {
                 data = await getProductsByType(selectedType);
+            } else if (selectedCategory !== 'ALL') {
+                data = await getProductsByCategory(selectedCategory);
             } else {
                 data = await getProducts();
             }
@@ -52,7 +56,7 @@ const Inventory = () => {
             fetchProducts();
         }, 500); // Debounce 500ms
         return () => clearTimeout(timer);
-    }, [searchQuery, selectedType, viewMode]);
+    }, [searchQuery, selectedType, selectedCategory, viewMode]);
 
 
     const handleCreateOrUpdate = async (data: CreateProductDTO) => {
@@ -132,12 +136,32 @@ const Inventory = () => {
                     <select
                         className="w-full px-4 py-2 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-gold/50 outline-none cursor-pointer"
                         value={selectedType}
-                        onChange={(e) => setSelectedType(e.target.value as TypeProduct | 'ALL')}
-                        disabled={viewMode === 'LOW_STOCK' || searchQuery !== ''}
+                        onChange={(e) => {
+                            setSelectedType(e.target.value as TypeProduct | 'ALL');
+                            if (e.target.value !== 'ALL') setSelectedCategory('ALL');
+                        }}
+                        disabled={viewMode === 'LOW_STOCK' || searchQuery !== '' || selectedCategory !== 'ALL'}
                     >
                         <option value="ALL">All Types</option>
                         {Object.values(TypeProduct).map(t => (
                             <option key={t} value={t}>{t}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="w-full md:w-48">
+                    <select
+                        className="w-full px-4 py-2 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-gold/50 outline-none cursor-pointer"
+                        value={selectedCategory}
+                        onChange={(e) => {
+                            setSelectedCategory(e.target.value as Category | 'ALL');
+                            if (e.target.value !== 'ALL') setSelectedType('ALL');
+                        }}
+                        disabled={viewMode === 'LOW_STOCK' || searchQuery !== '' || selectedType !== 'ALL'}
+                    >
+                        <option value="ALL">All Categories</option>
+                        {Object.values(Category).map(c => (
+                            <option key={c} value={c}>{c}</option>
                         ))}
                     </select>
                 </div>

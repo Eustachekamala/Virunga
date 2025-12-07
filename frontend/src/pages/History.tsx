@@ -38,7 +38,8 @@ const History = () => {
 
     const fetchMovements = () => {
         setLoading(true);
-        const data = filterMovements(filters);
+        const allMovements = getMovements();
+        const data = filterMovements(allMovements, filters);
         setMovements(data);
         setLoading(false);
     };
@@ -89,8 +90,8 @@ const History = () => {
                     <button
                         onClick={() => setShowFilters(!showFilters)}
                         className={`px-5 py-2 rounded-lg font-medium transition-all border ${hasActiveFilters
-                                ? 'bg-gold text-cocoa border-gold'
-                                : 'bg-white text-cocoa border-cocoa/20 hover:bg-cocoa/5'
+                            ? 'bg-gold text-cocoa border-gold'
+                            : 'bg-white text-cocoa border-cocoa/20 hover:bg-cocoa/5'
                             }`}
                     >
                         🔍 Filters {hasActiveFilters && `(${Object.values(filters).filter(v => v).length})`}
@@ -246,8 +247,8 @@ const History = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${movement.type === 'ENTREE'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-orange-100 text-orange-700'
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'bg-orange-100 text-orange-700'
                                                 }`}>
                                                 {movement.type === 'ENTREE' ? '📥 IN' : '📤 OUT'}
                                             </span>
