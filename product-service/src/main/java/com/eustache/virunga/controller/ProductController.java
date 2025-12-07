@@ -2,6 +2,7 @@ package com.eustache.virunga.controller;
 
 import com.eustache.virunga.DTO.ProductDTO;
 import com.eustache.virunga.DTO.ProductResponseDTO;
+import com.eustache.virunga.model.Category;
 import com.eustache.virunga.model.TypeProduct;
 import com.eustache.virunga.services.ProductServiceImpl;
 
@@ -52,6 +53,16 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid type supplied")
     })
+    @PatchMapping("stock-in/{id}")
+    public ResponseEntity<String> stockIn(@PathVariable Integer id, @RequestParam int quantity) {
+        return productService.stockIn(id, quantity);
+    }
+
+    @PatchMapping("stock-out/{id}")
+    public ResponseEntity<String> stockOut(@PathVariable Integer id, @RequestParam int quantity) {
+        return productService.stockOut(id, quantity);
+    }
+
     @GetMapping("type/{type}")
     public ResponseEntity<List<ProductResponseDTO>> getProductsByType(
             @PathVariable String type) {
@@ -64,12 +75,29 @@ public class ProductController {
         return productService.getProductsByType(typeEnum);
     }
 
+    @Operation(summary = "Get Products by category")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid category supplied")
+    })
+    @GetMapping("category/{category}")
+    public ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(
+            @PathVariable String category) {
+        Category categoryEnum;
+        try {
+            categoryEnum = Category.valueOf(category.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
+        }
+        return productService.getProductsByCategory(categoryEnum);
+    }
+
     @Operation(summary = "Get Products with low stocks")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Product fetched successfully"),
             @ApiResponse(responseCode = "404", description = "Products with no found")
     })
-    @GetMapping("lowStock")
+    @GetMapping("low-stock")
     public ResponseEntity<List<ProductResponseDTO>> getLowProductStocks() {
         return productService.getLowStockProducts();
     }

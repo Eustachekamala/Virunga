@@ -4,6 +4,7 @@ import com.eustache.virunga.DTO.ProductDTO;
 import com.eustache.virunga.DTO.ProductResponseDTO;
 import com.eustache.virunga.ProductMapper;
 import com.eustache.virunga.DAO.ProductDAO;
+import com.eustache.virunga.model.Category;
 import com.eustache.virunga.model.Product;
 import com.eustache.virunga.model.Status;
 import com.eustache.virunga.model.TypeProduct;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -39,9 +39,12 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Creates a new product in the system.
      * 
-     * @param productDTO The product data transfer object containing the product information
-     * @return ResponseEntity containing a success message and HTTP status CREATED if successful,
-     *         or an error message and HTTP status INTERNAL_SERVER_ERROR if creation fails
+     * @param productDTO The product data transfer object containing the product
+     *                   information
+     * @return ResponseEntity containing a success message and HTTP status CREATED
+     *         if successful,
+     *         or an error message and HTTP status INTERNAL_SERVER_ERROR if creation
+     *         fails
      */
     @Override
     public ResponseEntity<String> createProduct(ProductDTO productDTO) {
@@ -53,11 +56,12 @@ public class ProductServiceImpl implements ProductService {
 
             Product product = productMapper.toEntity(productDTO, imagePath);
             product.setImageFile(imagePath);
-            if (product.getQuantity() == null) product.setQuantity(0);
+            if (product.getQuantity() == null)
+                product.setQuantity(0);
             product.setStockAlertThreshold(DEFAULT_STOCK_ALERT_THRESHOLD);
-            //To update the status
+            // To update the status
             updateProductStatus(product);
-            
+
             // This will handle duplicate product names
             try {
                 productDAO.save(product);
@@ -78,9 +82,11 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Updates an existing product in the system.
      * 
-     * @param id The ID of the product to update
-     * @param productDTO The product data transfer object containing the updated product information
-     * @return ResponseEntity containing a success message and HTTP status OK if successful,
+     * @param id         The ID of the product to update
+     * @param productDTO The product data transfer object containing the updated
+     *                   product information
+     * @return ResponseEntity containing a success message and HTTP status OK if
+     *         successful,
      *         or an error message and HTTP status BAD_REQUEST if update fails
      */
     @Override
@@ -95,13 +101,12 @@ public class ProductServiceImpl implements ProductService {
             Optional.ofNullable(productDTO.quantity()).ifPresent(existingProduct::setQuantity);
             Optional.ofNullable(productDTO.typeProduct()).ifPresent(existingProduct::setTypeProduct);
 
-
             if (productDTO.imagFile() != null && !productDTO.imagFile().isEmpty()) {
                 String newImageFile = fileStorageService.saveImage(productDTO.imagFile());
                 Optional.ofNullable(newImageFile).ifPresent(existingProduct::setImageFile);
             }
 
-            //To update the status
+            // To update the status
             updateProductStatus(existingProduct);
             productDAO.save(existingProduct);
             log.info("Product updated: {}", existingProduct);
@@ -121,8 +126,10 @@ public class ProductServiceImpl implements ProductService {
      * Deletes a product from the system.
      * 
      * @param id The ID of the product to delete
-     * @return ResponseEntity containing a success message and HTTP status OK if successful,
-     *         or an error message and HTTP status NOT_FOUND if the product doesn't exist
+     * @return ResponseEntity containing a success message and HTTP status OK if
+     *         successful,
+     *         or an error message and HTTP status NOT_FOUND if the product doesn't
+     *         exist
      */
     @Override
     public ResponseEntity<String> deleteProduct(Integer id) {
@@ -142,7 +149,8 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Retrieves all products from the system.
      * 
-     * @return ResponseEntity containing a list of ProductResponseDTO and HTTP status OK,
+     * @return ResponseEntity containing a list of ProductResponseDTO and HTTP
+     *         status OK,
      *         returns an empty list if no products are found
      */
     @Override
@@ -163,7 +171,8 @@ public class ProductServiceImpl implements ProductService {
      * Retrieves a product by its ID.
      * 
      * @param id The ID of the product to retrieve
-     * @return ResponseEntity containing the ProductResponseDTO and HTTP status OK if found,
+     * @return ResponseEntity containing the ProductResponseDTO and HTTP status OK
+     *         if found,
      *         or HTTP status NOT_FOUND if the product doesn't exist
      */
     @Override
@@ -171,8 +180,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             ProductResponseDTO productResponseDTO = productMapper.toDto(
                     productDAO.findById(id)
-                            .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id))
-            );
+                            .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id)));
             return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);
         } catch (Exception ex) {
             log.error("Failed to fetch product: {}", ex.getMessage(), ex);
@@ -184,7 +192,8 @@ public class ProductServiceImpl implements ProductService {
      * Retrieves products by their name.
      * 
      * @param name The name of the products to search for
-     * @return ResponseEntity containing a list of matching ProductResponseDTO and HTTP status OK,
+     * @return ResponseEntity containing a list of matching ProductResponseDTO and
+     *         HTTP status OK,
      *         returns an empty list if no products are found
      */
     @Override
@@ -205,8 +214,10 @@ public class ProductServiceImpl implements ProductService {
      * Retrieves products by their type.
      * 
      * @param type The type of products to retrieve
-     * @return ResponseEntity containing a list of matching ProductResponseDTO and HTTP status OK,
-     *         or an empty list and HTTP status INTERNAL_SERVER_ERROR if the operation fails
+     * @return ResponseEntity containing a list of matching ProductResponseDTO and
+     *         HTTP status OK,
+     *         or an empty list and HTTP status INTERNAL_SERVER_ERROR if the
+     *         operation fails
      */
     @Override
     public ResponseEntity<List<ProductResponseDTO>> getProductsByType(TypeProduct type) {
@@ -222,11 +233,35 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    /**
+     * Retrieves products by their category.
+     * 
+     * @param category The category of products to retrieve
+     * @return ResponseEntity containing a list of matching ProductResponseDTO and
+     *         HTTP status OK,
+     *         or an empty list and HTTP status INTERNAL_SERVER_ERROR if the
+     *         operation fails
+     */
+    @Override
+    public ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(Category category) {
+        try {
+            List<ProductResponseDTO> products = productDAO.findByCategory(category)
+                    .stream()
+                    .map(productMapper::toDto)
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(products, HttpStatus.OK);
+        } catch (Exception ex) {
+            log.error("Failed to fetch products by category {}: {}", category, ex.getMessage(), ex);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     /**
-     * Retrieves all products that are low on stock (quantity <= stock alert threshold).
+     * Retrieves all products that are low on stock (quantity <= stock alert
+     * threshold).
      * 
-     * @return ResponseEntity containing a list of low stock ProductResponseDTO and HTTP status OK,
+     * @return ResponseEntity containing a list of low stock ProductResponseDTO and
+     *         HTTP status OK,
      *         returns an empty list if no low stock products are found
      */
     @Override
@@ -234,7 +269,8 @@ public class ProductServiceImpl implements ProductService {
         try {
             List<ProductResponseDTO> lowStockProducts = productDAO.findAll()
                     .stream()
-                    .filter(p -> p.getQuantity() != null && p.getQuantity() <= p.getStockAlertThreshold())
+                    .filter(p -> p.getQuantity() != null && p.getStockAlertThreshold() != null
+                            && p.getQuantity() <= p.getStockAlertThreshold())
                     .map(productMapper::toDto)
                     .collect(Collectors.toList());
 
@@ -262,8 +298,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * Updates the status of a product based on its current quantity and stock alert threshold.
-     * Sets status to URGENT if quantity is below or equal to threshold, NON_URGENT otherwise.
+     * Updates the status of a product based on its current quantity and stock alert
+     * threshold.
+     * Sets status to URGENT if quantity is below or equal to threshold, NON_URGENT
+     * otherwise.
      * 
      * @param product The product to update the status for
      */
@@ -279,9 +317,9 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-
     /**
-     * Scheduled task that runs every 12 hours to check and update the status of all products
+     * Scheduled task that runs every 12 hours to check and update the status of all
+     * products
      * based on their current stock levels. This method runs asynchronously.
      */
     @Async
@@ -291,28 +329,28 @@ public class ProductServiceImpl implements ProductService {
 
         var lowStockProducts = productDAO.findAll().stream()
                 .peek(this::updateProductStatus) // update each product's status
-                .map(productDAO::save)           // save updated status
-                .filter(p -> p.getQuantity() <= p.getStockAlertThreshold())
+                .map(productDAO::save) // save updated status
+                .filter(p -> p.getQuantity() != null && p.getStockAlertThreshold() != null
+                        && p.getQuantity() <= p.getStockAlertThreshold())
                 .toList();
 
         // If there are low-stock products, send an email alert
         if (!lowStockProducts.isEmpty()) {
-            StringBuilder message = new StringBuilder("Low Stock Alert!\n\nThe following products are below their stock threshold:\n\n");
+            StringBuilder message = new StringBuilder(
+                    "Low Stock Alert!\n\nThe following products are below their stock threshold:\n\n");
 
             lowStockProducts.forEach(p -> message.append(String.format(
                     "• %s — Qty: %d (Threshold: %d)\n",
                     p.getName(),
                     p.getQuantity(),
-                    p.getStockAlertThreshold()
-            )));
+                    p.getStockAlertThreshold())));
 
             message.append("\nPlease restock these items as soon as possible.");
 
             emailService.sendEmail(
                     "eustachekamala.dev@gmail.com",
                     "Stock Alert: Low Inventory Detected",
-                    message.toString()
-            );
+                    message.toString());
 
             log.warn("Low stock alert email sent to admin. Products: {}", lowStockProducts.size());
         }
@@ -320,5 +358,78 @@ public class ProductServiceImpl implements ProductService {
         log.info("Low stock check completed.");
     }
 
+    /**
+     * Increases the stock quantity of a product.
+     * 
+     * @param id       The ID of the product
+     * @param quantity The quantity to add
+     * @return ResponseEntity with success or error message
+     */
+    @Override
+    public ResponseEntity<String> stockIn(Integer id, int quantity) {
+        try {
+            Product product = productDAO.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
 
+            if (quantity <= 0) {
+                return new ResponseEntity<>("Quantity must be greater than 0", HttpStatus.BAD_REQUEST);
+            }
+
+            product.setQuantity(product.getQuantity() + quantity);
+
+            // To update the status
+            updateProductStatus(product);
+
+            productDAO.save(product);
+            log.info("Stock IN for product {}: added {}, new quantity {}", product.getName(), quantity,
+                    product.getQuantity());
+
+            checkAndLogLowStock(product);
+
+            return new ResponseEntity<>("Stock updated successfully", HttpStatus.OK);
+        } catch (Exception ex) {
+            log.error("Failed to update stock: {}", ex.getMessage(), ex);
+            return new ResponseEntity<>("Failed to update stock", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Decreases the stock quantity of a product.
+     * 
+     * @param id       The ID of the product
+     * @param quantity The quantity to remove
+     * @return ResponseEntity with success or error message
+     */
+    @Override
+    public ResponseEntity<String> stockOut(Integer id, int quantity) {
+        try {
+            Product product = productDAO.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
+
+            if (quantity <= 0) {
+                return new ResponseEntity<>("Quantity must be greater than 0", HttpStatus.BAD_REQUEST);
+            }
+
+            if (product.getQuantity() < quantity) {
+                return new ResponseEntity<>("Insufficient stock. Available: " + product.getQuantity(),
+                        HttpStatus.BAD_REQUEST);
+            }
+
+            product.setQuantity(product.getQuantity() - quantity);
+
+            // To update the status
+            updateProductStatus(product);
+
+            productDAO.save(product);
+            log.info("Stock OUT for product {}: removed {}, new quantity {}", product.getName(), quantity,
+                    product.getQuantity());
+
+            checkAndLogLowStock(product);
+
+            return new ResponseEntity<>("Stock updated successfully", HttpStatus.OK);
+        } catch (Exception ex) {
+            log.error("Failed to update stock: {}", ex.getMessage(), ex);
+            return new ResponseEntity<>("Failed to update stock", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
