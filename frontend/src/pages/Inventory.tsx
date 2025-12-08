@@ -13,7 +13,7 @@ import {
 } from '../services/api';
 import { TypeProduct, Category } from '../types';
 import type { CreateProductDTO, Product } from '../types';
-import { generateLowStockInventoryReport, generateInventoryReport } from '../services/pdfGenerator';
+import { generateLowStockInventoryReport, generateInventoryReport, } from '../services/pdfGenerator';
 import {
     Plus,
     FileDown,
@@ -94,6 +94,7 @@ const Inventory = () => {
         if (viewMode === 'LOW_STOCK') {
             generateLowStockInventoryReport(products);
         } else {
+            // Use category-grouped PDF for all products view
             generateInventoryReport(products);
         }
     };

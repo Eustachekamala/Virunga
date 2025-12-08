@@ -4,11 +4,8 @@ import type { CreateProductDTO, Product } from '../types';
 
 const API_BASE_URL = '/api/v1/products';
 
-const api = axios.create({
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+// Axios instance without default Content-Type
+const api = axios.create();
 
 export const getProducts = async (): Promise<Product[]> => {
     const response = await api.get(`${API_BASE_URL}/allProducts`);
@@ -26,11 +23,7 @@ export const createProduct = async (data: CreateProductDTO): Promise<string> => 
         formData.append('imageFile', data.imageFile);
     }
 
-    const response = await api.post(`${API_BASE_URL}/insert`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+    const response = await api.post(`${API_BASE_URL}/insert`, formData); // Axios auto sets multipart
     return response.data;
 };
 
@@ -66,21 +59,33 @@ export const deleteProduct = async (id: number): Promise<string> => {
 
 export const updateProduct = async (id: number, data: CreateProductDTO): Promise<string> => {
     const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('quantity', data.quantity.toString());
-    formData.append('description', data.description);
-    formData.append('category', data.category);
-    formData.append('typeProduct', data.typeProduct);
+    
+    // Only append non-empty/non-undefined values
+    if (data.name && data.name.trim()) {
+        formData.append('name', data.name);
+    }
+    if (data.quantity !== null && data.quantity !== undefined) {
+        formData.append('quantity', data.quantity.toString());
+    }
+    if (data.description && data.description.trim()) {
+        formData.append('description', data.description);
+    }
+    if (data.category && data.category.trim()) {
+        formData.append('category', data.category);
+    }
+    if (data.typeProduct && data.typeProduct.trim()) {
+        formData.append('typeProduct', data.typeProduct);
+    }
     if (data.imageFile) {
         formData.append('imageFile', data.imageFile);
     }
 
-    // Using simple axios.post because patch with multipart might be tricky depending on backend handling,
-    // but controller says @PatchMapping. Browsers/Axios handle multipart patch usually fine.
-    const response = await api.patch(`${API_BASE_URL}/update/${id}`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+    const response = await api.patch(`${API_BASE_URL}/update/${id}`, formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }
+    );
     return response.data;
 };

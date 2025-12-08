@@ -8,7 +8,7 @@ import { Product } from '../types';
 const addCompanyHeader = (doc: jsPDF, title: string) => {
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
-    doc.text('VIRUNGA - Chocolat du Kivu', 105, 20, { align: 'center' });
+    doc.text('Virunga ToolHub', 105, 20, { align: 'center' });
 
     doc.setFontSize(14);
     doc.setFont('helvetica', 'normal');
@@ -337,3 +337,113 @@ export const generateLowStockInventoryReport = (products: Product[]): void => {
 
     doc.save(`low_stock_inventory_${format(new Date(), 'yyyyMMdd')}.pdf`);
 };
+
+// Inventory Report Grouped by Category with Detailed Tables
+// export const generateInventoryByCategory = (products: Product[]): void => {
+//     const doc = new jsPDF();
+//     addCompanyHeader(doc, 'Complete Inventory Report by Category');
+
+//     const totalProducts = products.length;
+//     const totalQuantity = products.reduce((sum, p) => sum + p.quantity, 0);
+//     const lowStockCount = products.filter(p => p.quantity <= (p.stockAlertThreshold || 10)).length;
+
+//     doc.setFontSize(12);
+//     doc.setFont('helvetica', 'bold');
+//     doc.text('Inventory Summary', 20, 65);
+//     doc.setFont('helvetica', 'normal');
+//     doc.text(`Total Products: ${totalProducts}`, 20, 72);
+//     doc.text(`Total Units: ${totalQuantity}`, 20, 79);
+//     doc.text(`Low Stock Items: ${lowStockCount}`, 20, 86);
+
+//     // Group products by category
+//     const groupedByCategory = products.reduce((acc, product) => {
+//         const category = product.category || 'UNCATEGORIZED';
+//         if (!acc[category]) {
+//             acc[category] = [];
+//         }
+//         acc[category].push(product);
+//         return acc;
+//     }, {} as Record<string, Product[]>);
+
+//     // Sort categories alphabetically
+//     const sortedCategories = Object.keys(groupedByCategory).sort();
+
+//     let currentY = 95;
+
+//     sortedCategories.forEach((category, index) => {
+//         const categoryProducts = groupedByCategory[category];
+
+//         // Add page break if needed to prevent table cutoff
+//         if (currentY > 240) {
+//             doc.addPage();
+//             currentY = 20;
+//             addCompanyHeader(doc, 'Complete Inventory Report by Category (Continued)');
+//             currentY = 60;
+//         }
+
+//         // Category heading - bold and larger
+//         doc.setFontSize(14);
+//         doc.setFont('helvetica', 'bold');
+//         doc.setTextColor(46, 24, 16); // Dark brown color matching header
+//         doc.text(`📦 ${category.toUpperCase()}`, 20, currentY);
+//         doc.setTextColor(0, 0, 0);
+
+//         currentY += 8;
+
+//         // Category table
+//         const tableData = categoryProducts.map(p => [
+//             p.name,
+//             p.typeProduct || '-',
+//             p.quantity.toString(),
+//             (p.stockAlertThreshold || 10).toString(),
+//             p.quantity === 0 ? 'OUT' :
+//                 (p.quantity <= (p.stockAlertThreshold || 10) ? 'LOW' : 'OK'),
+//             p.description || '-'
+//         ]);
+
+//         autoTable(doc, {
+//             startY: currentY,
+//             head: [['Product Name', 'Type', 'Qty', 'Threshold', 'Status', 'Description']],
+//             body: tableData,
+//             theme: 'grid',
+//             headStyles: { 
+//                 fillColor: [212, 175, 55], // Gold color
+//                 textColor: [46, 24, 16],   // Dark brown
+//                 fontStyle: 'bold'
+//             },
+//             bodyStyles: { textColor: [50, 50, 50] },
+//             styles: { fontSize: 9, cellPadding: 4 },
+//             columnStyles: {
+//                 0: { cellWidth: 50 },
+//                 1: { cellWidth: 25 },
+//                 2: { cellWidth: 15 },
+//                 3: { cellWidth: 20 },
+//                 4: { cellWidth: 18 },
+//                 5: { cellWidth: 42 }
+//             },
+//             didParseCell: function (data) {
+//                 if (data.row.section === 'body' && data.column.index === 4) {
+//                     if (data.cell.raw === 'OUT') {
+//                         data.cell.styles.textColor = [220, 38, 38];
+//                         data.cell.styles.fontStyle = 'bold';
+//                     } else if (data.cell.raw === 'LOW') {
+//                         data.cell.styles.textColor = [234, 179, 8];
+//                         data.cell.styles.fontStyle = 'bold';
+//                     } else {
+//                         data.cell.styles.textColor = [16, 185, 129];
+//                     }
+//                 }
+//             },
+//             margin: { top: 10 },
+//         });
+
+//         // Get the final Y position after the table
+//         const finalY = (doc as any).lastAutoTable.finalY || currentY + 20;
+//         currentY = finalY + 10;
+
+//         // Add spacing between categories
+//         currentY += 5;
+//     });
+
+//     doc.save(`inventory_by_category_${format(new Date(), 'yyyyMMdd')}.pdf`);
+// };

@@ -4,17 +4,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eustache.virunga.model.Category;
 import com.eustache.virunga.model.TypeProduct;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
-public record ProductDTO(
-        @NotBlank(message = "Name is required")
-        String name,
-        @NotNull(message = "Quantity is required")
-        Integer quantity,
-        String description,
-        Category category,
-        TypeProduct typeProduct,
-        MultipartFile imageFile
-) {
+@Getter
+@Setter
+public class ProductDTO {
+
+    private String name;
+
+    private Integer quantity;
+
+    private String description;
+    private Category category;
+    private TypeProduct typeProduct;
+    private MultipartFile imageFile;
 }

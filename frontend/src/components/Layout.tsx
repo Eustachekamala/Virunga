@@ -27,10 +27,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 {/* Logo/Header */}
                 <div className="p-8 border-b border-white/10">
                     <h1 className="text-2xl font-serif font-bold text-gold flex items-center gap-3">
-                        Virunga Products
+                        Virunga ToolHub
                     </h1>
-                    <p className="text-sm text-white/60 mt-1 ml-11">Manufacturing Equipment</p>
+                    <p className="text-sm text-white/60 mt-1 pl-9">
+                        Central hub for tools & materials.
+                    </p>
                 </div>
+
 
                 <nav className="flex-1 py-8 px-4 space-y-2">
                     <NavItem to="/" exact icon={<LayoutDashboard className="w-5 h-5" />}>

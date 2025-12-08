@@ -46,15 +46,15 @@ public class ProductMapper {
         }
 
         Product product = new Product();
-        product.setName(productDTO.name());
-        product.setQuantity(productDTO.quantity() != null ? productDTO.quantity() : 0);
+        product.setName(productDTO.getName());
+        product.setQuantity(productDTO.getQuantity() != null ? productDTO.getQuantity() : 0);
         product.setStockAlertThreshold(
-                productDTO.quantity() != null ? productDTO.quantity() : DEFAULT_STOCK_ALERT_THRESHOLD
+                productDTO.getQuantity() != null ? productDTO.getQuantity() : DEFAULT_STOCK_ALERT_THRESHOLD
         );
-        product.setCategory(productDTO.category());
+        product.setCategory(productDTO.getCategory());
         product.setImageFile(image);
-        product.setDescription(productDTO.description());
-        product.setTypeProduct(productDTO.typeProduct());
+        product.setDescription(productDTO.getDescription());
+        product.setTypeProduct(productDTO.getTypeProduct());
         product.setCreatedAt(LocalDate.now());
         product.setUpdatedAt(LocalDate.now());
         return product;

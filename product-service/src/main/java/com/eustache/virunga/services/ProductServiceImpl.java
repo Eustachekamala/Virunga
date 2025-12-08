@@ -50,8 +50,8 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<String> createProduct(ProductDTO productDTO) {
         try {
             String imagePath = null;
-            if (productDTO.imageFile() != null && !productDTO.imageFile().isEmpty()) {
-                imagePath = fileStorageService.saveImage(productDTO.imageFile());
+            if (productDTO.getImageFile() != null && !productDTO.getImageFile().isEmpty()) {
+                imagePath = fileStorageService.saveImage(productDTO.getImageFile());
             }
 
             Product product = productMapper.toEntity(productDTO, imagePath);
@@ -96,15 +96,15 @@ public class ProductServiceImpl implements ProductService {
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id)); // A
 
             // B: Safe update logic using Optional
-            Optional.ofNullable(productDTO.name()).ifPresent(existingProduct::setName);
-            Optional.ofNullable(productDTO.category()).ifPresent(existingProduct::setCategory);
-            Optional.ofNullable(productDTO.description()).ifPresent(existingProduct::setDescription);
-            Optional.ofNullable(productDTO.quantity()).ifPresent(existingProduct::setQuantity);
-            Optional.ofNullable(productDTO.typeProduct()).ifPresent(existingProduct::setTypeProduct);
+            Optional.ofNullable(productDTO.getName()).ifPresent(existingProduct::setName);
+            Optional.ofNullable(productDTO.getCategory()).ifPresent(existingProduct::setCategory);
+            Optional.ofNullable(productDTO.getDescription()).ifPresent(existingProduct::setDescription);
+            Optional.ofNullable(productDTO.getQuantity()).ifPresent(existingProduct::setQuantity);
+            Optional.ofNullable(productDTO.getTypeProduct()).ifPresent(existingProduct::setTypeProduct);
 
             // C: Image file handling
-            if (productDTO.imageFile() != null && !productDTO.imageFile().isEmpty()) {
-                String newImageFile = fileStorageService.saveImage(productDTO.imageFile());
+            if (productDTO.getImageFile() != null && !productDTO.getImageFile().isEmpty()) {
+                String newImageFile = fileStorageService.saveImage(productDTO.getImageFile());
                 // It is VITAL that newImageFile is not null/invalid here.
                 // If saveImage throws an exception, it goes to the catch block.
                 Optional.ofNullable(newImageFile).ifPresent(existingProduct::setImageFile);
@@ -291,7 +291,7 @@ public class ProductServiceImpl implements ProductService {
                     .collect(Collectors.toList());
 
             if (!lowStockProducts.isEmpty()) {
-                log.warn("Low stock products: {}", lowStockProducts);
+                // log.warn("Low stock products: {}", lowStockProducts);
             }
 
             return new ResponseEntity<>(lowStockProducts, HttpStatus.OK);
@@ -339,7 +339,7 @@ public class ProductServiceImpl implements ProductService {
      * based on their current stock levels. This method runs asynchronously.
      */
     @Async
-    @Scheduled(cron = "0 0 */12 * * *") // every 12 hours
+    @Scheduled(fixedRate = 3600000) // every 1 hour (3600 * 1000 ms)
     public void scheduledLowStockCheck() {
         log.info("Running scheduled low stock check...");
 
@@ -374,78 +374,4 @@ public class ProductServiceImpl implements ProductService {
         log.info("Low stock check completed.");
     }
 
-    /**
-     * Increases the stock quantity of a product.
-     * 
-     * @param id       The ID of the product
-     * @param quantity The quantity to add
-     * @return ResponseEntity with success or error message
-     */
-    @Override
-    public ResponseEntity<String> stockIn(Integer id, Integer quantity) {
-        try {
-            Product product = productDAO.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
-
-            if (quantity <= 0) {
-                return new ResponseEntity<>("Quantity must be greater than 0", HttpStatus.BAD_REQUEST);
-            }
-
-            product.setQuantity(product.getQuantity() + quantity);
-
-            // To update the status
-            updateProductStatus(product);
-
-            productDAO.save(product);
-            log.info("Stock IN for product {}: added {}, new quantity {}", product.getName(), quantity,
-                    product.getQuantity());
-
-            checkAndLogLowStock(product);
-
-            return new ResponseEntity<>("Stock updated successfully", HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Failed to update stock: {}", ex.getMessage(), ex);
-            return new ResponseEntity<>("Failed to update stock", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
-     * Decreases the stock quantity of a product.
-     * 
-     * @param id       The ID of the product
-     * @param quantity The quantity to remove
-     * @return ResponseEntity with success or error message
-     */
-    @Override
-    public ResponseEntity<String> stockOut(Integer id, Integer quantity) {
-        try {
-            Product product = productDAO.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
-
-            if (quantity <= 0) {
-                return new ResponseEntity<>("Quantity must be greater than 0", HttpStatus.BAD_REQUEST);
-            }
-
-            if (product.getQuantity() < quantity) {
-                return new ResponseEntity<>("Insufficient stock. Available: " + product.getQuantity(),
-                        HttpStatus.BAD_REQUEST);
-            }
-
-            product.setQuantity(product.getQuantity() - quantity);
-
-            // To update the status
-            updateProductStatus(product);
-
-            productDAO.save(product);
-            log.info("Stock OUT for product {}: removed {}, new quantity {}", product.getName(), quantity,
-                    product.getQuantity());
-
-            checkAndLogLowStock(product);
-
-            return new ResponseEntity<>("Stock updated successfully", HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Failed to update stock: {}", ex.getMessage(), ex);
-            return new ResponseEntity<>("Failed to update stock", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

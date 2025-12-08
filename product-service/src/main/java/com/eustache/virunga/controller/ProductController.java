@@ -53,16 +53,6 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid type supplied")
     })
-    @PatchMapping("stock-in/{id}")
-    public ResponseEntity<String> stockIn(@PathVariable Integer id, @RequestParam int quantity) {
-        return productService.stockIn(id, quantity);
-    }
-
-    @PatchMapping("stock-out/{id}")
-    public ResponseEntity<String> stockOut(@PathVariable Integer id, @RequestParam int quantity) {
-        return productService.stockOut(id, quantity);
-    }
-
     @GetMapping("type/{type}")
     public ResponseEntity<List<ProductResponseDTO>> getProductsByType(
             @PathVariable String type) {
@@ -107,7 +97,7 @@ public class ProductController {
             @ApiResponse(responseCode = "201", description = "Updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid data")
     })
-    @PatchMapping("update/{id}")
+    @PatchMapping(value = "update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateProduct(
             @PathVariable Integer id,
             @ModelAttribute ProductDTO productDTO) {

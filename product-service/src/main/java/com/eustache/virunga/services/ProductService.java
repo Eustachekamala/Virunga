@@ -30,8 +30,4 @@ public interface ProductService {
     ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(Category category);
 
     ResponseEntity<List<ProductResponseDTO>> getLowStockProducts();
-
-    ResponseEntity<String> stockIn(Integer id, Integer quantity);
-
-    ResponseEntity<String> stockOut(Integer id, Integer quantity);
 }
