@@ -368,7 +368,7 @@ public class ProductServiceImpl implements ProductService {
                     "Stock Alert: Low Inventory Detected",
                     message.toString());
 
-            log.warn("Low stock alert email sent to admin. Products: {}", lowStockProducts.size());
+            // log.warn("Low stock alert email sent to admin. Products: {}", lowStockProducts.size());
         }
 
         log.info("Low stock check completed.");
@@ -382,7 +382,7 @@ public class ProductServiceImpl implements ProductService {
      * @return ResponseEntity with success or error message
      */
     @Override
-    public ResponseEntity<String> stockIn(Integer id, int quantity) {
+    public ResponseEntity<String> stockIn(Integer id, Integer quantity) {
         try {
             Product product = productDAO.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
@@ -417,7 +417,7 @@ public class ProductServiceImpl implements ProductService {
      * @return ResponseEntity with success or error message
      */
     @Override
-    public ResponseEntity<String> stockOut(Integer id, int quantity) {
+    public ResponseEntity<String> stockOut(Integer id, Integer quantity) {
         try {
             Product product = productDAO.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));

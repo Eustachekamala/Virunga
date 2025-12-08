@@ -22,8 +22,8 @@ export const createProduct = async (data: CreateProductDTO): Promise<string> => 
     formData.append('description', data.description);
     formData.append('category', data.category);
     formData.append('typeProduct', data.typeProduct);
-    if (data.imagFile) {
-        formData.append('imagFile', data.imagFile);
+    if (data.imageFile) {
+        formData.append('imageFile', data.imageFile);
     }
 
     const response = await api.post(`${API_BASE_URL}/insert`, formData, {
@@ -71,8 +71,8 @@ export const updateProduct = async (id: number, data: CreateProductDTO): Promise
     formData.append('description', data.description);
     formData.append('category', data.category);
     formData.append('typeProduct', data.typeProduct);
-    if (data.imagFile) {
-        formData.append('imagFile', data.imagFile);
+    if (data.imageFile) {
+        formData.append('imageFile', data.imageFile);
     }
 
     // Using simple axios.post because patch with multipart might be tricky depending on backend handling,

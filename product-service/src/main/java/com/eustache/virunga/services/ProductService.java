@@ -5,6 +5,7 @@ import com.eustache.virunga.DTO.ProductResponseDTO;
 import com.eustache.virunga.model.Category;
 import com.eustache.virunga.model.TypeProduct;
 
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +31,7 @@ public interface ProductService {
 
     ResponseEntity<List<ProductResponseDTO>> getLowStockProducts();
 
-    ResponseEntity<String> stockIn(Integer id, int quantity);
+    ResponseEntity<String> stockIn(Integer id, Integer quantity);
 
-    ResponseEntity<String> stockOut(Integer id, int quantity);
+    ResponseEntity<String> stockOut(Integer id, Integer quantity);
 }

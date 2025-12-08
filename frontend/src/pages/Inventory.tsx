@@ -106,7 +106,7 @@ const Inventory = () => {
                             : 'bg-white text-cocoa hover:bg-cocoa/5'
                             }`}
                     >
-                        {viewMode === 'LOW_STOCK' ? 'Show All' : '⚠ Low Stock'}
+                        {viewMode === 'LOW_STOCK' ? 'Show All' : 'Low Stock'}
                     </button>
 
                     <button

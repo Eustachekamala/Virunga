@@ -24,69 +24,94 @@ public class ProductInitializer {
                 System.out.println("✅ Sample products initialized successfully!");
             } else {
                 System.out.println(
-                        "ℹ️ Database already contains " + productDAO.count() + " products. Skipping initialization.");
+                        "Database already contains " + productDAO.count() + " products. Skipping initialization.");
             }
         };
     }
 
     private void initializeSampleProducts(ProductDAO productDAO) {
-        // Product 1: Screwdriver
+
+        // Product 1: Screwdriver Set → MECHANICAL (hand tools)
         createProduct(productDAO,
                 "Screwdriver Set",
                 "Professional screwdriver set with multiple heads for various applications",
-                Category.ELECTRONICS,
+                Category.MECHANICAL,
                 TypeProduct.NON_CONSUMABLE,
                 15,
                 DEFAULT_STOCK_ALERT_THRESHOLD,
                 Status.NON_URGENT);
 
-        // Product 2: Electrical Wire (LOW STOCK)
+        // Product 2: Electrical Wire (LOW STOCK) → ELECTRICAL
         createProduct(productDAO,
                 "Electrical Wire 2.5mm",
                 "High-quality copper electrical wire, 2.5mm diameter, 100m roll",
-                Category.ELECTRICITY,
+                Category.ELECTRICAL,
                 TypeProduct.CONSUMABLE,
                 3,
-                10, // Custom threshold for this product
+                10,
                 Status.URGENT);
 
-        // Product 3: Pipe Wrench
+        // Product 3: Pipe Wrench → PLUMBING (plumbing tool)
         createProduct(productDAO,
                 "Pipe Wrench 12 inch",
                 "Heavy-duty pipe wrench for plumbing and maintenance work",
                 Category.PLUMBING,
                 TypeProduct.NON_CONSUMABLE,
                 8,
-                3, // Custom threshold for this product
+                3,
                 Status.NON_URGENT);
 
-        // Product 4: PVC Pipes
+        // Product 4: PVC Pipes → PLUMBING (material)
         createProduct(productDAO,
                 "PVC Pipe 1 inch",
                 "Standard PVC pipes, 1 inch diameter, 3 meter length",
                 Category.PLUMBING,
                 TypeProduct.CONSUMABLE,
                 25,
-                15, // Custom threshold for this product
+                15,
                 Status.NON_URGENT);
 
-        // Product 5: Circuit Breakers (LOW STOCK)
+        // Product 5: Circuit Breakers (LOW STOCK) → ELECTRICAL
         createProduct(productDAO,
                 "Circuit Breaker 20A",
                 "20 Ampere circuit breakers for electrical panel installations",
-                Category.ELECTRICITY,
+                Category.ELECTRICAL,
                 TypeProduct.CONSUMABLE,
                 4,
                 DEFAULT_STOCK_ALERT_THRESHOLD,
                 Status.URGENT);
 
-        System.out.println("📦 Created 5 sample products:");
-        System.out.println("   1. Screwdriver Set (ELECTRONICS, NON_CONSUMABLE) - Qty: 15");
-        System.out.println("   2. Electrical Wire 2.5mm (ELECTRICITY, CONSUMABLE) - Qty: 3 ⚠️ LOW STOCK");
-        System.out.println("   3. Pipe Wrench 12 inch (PLUMBING, NON_CONSUMABLE) - Qty: 8");
-        System.out.println("   4. PVC Pipe 1 inch (PLUMBING, CONSUMABLE) - Qty: 25");
-        System.out.println("   5. Circuit Breaker 20A (ELECTRICITY, CONSUMABLE) - Qty: 4 ⚠️ LOW STOCK");
+        // Product 6: Sensor Module → ELECTRONICS
+        createProduct(productDAO,
+                "Infrared Sensor Module",
+                "IR proximity sensor module for detection and automation systems",
+                Category.ELECTRONICS,
+                TypeProduct.NON_CONSUMABLE,
+                12,
+                5,
+                Status.NON_URGENT);
+
+        // Product 7: Bolt Pack → INDUSTRIAL_SUPPLIES
+        createProduct(productDAO,
+                "Bolt Pack M8",
+                "Industrial M8 bolts, 100 pieces pack",
+                Category.INDUSTRIAL_SUPPLIES,
+                TypeProduct.CONSUMABLE,
+                40,
+                20,
+                Status.NON_URGENT);
+
+        System.out.println("Created 7 sample products:");
+        System.out.println("   1. Screwdriver Set (MECHANICAL)");
+        System.out.println("   2. Electrical Wire 2.5mm (ELECTRICAL)");
+        System.out.println("   3. Pipe Wrench 12 inch (PLUMBING)");
+        System.out.println("   4. PVC Pipe 1 inch (PLUMBING)");
+        System.out.println("   5. Circuit Breaker 20A (ELECTRICAL)");
+        System.out.println("   6. Infrared Sensor Module (ELECTRONICS)");
+        System.out.println("   7. Bolt Pack M8 (INDUSTRIAL_SUPPLIES)");
     }
+
+
 
     private void createProduct(ProductDAO productDAO, String name, String description,
             Category category, TypeProduct typeProduct,

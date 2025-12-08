@@ -11,9 +11,11 @@ export const TypeProduct = {
 export type TypeProduct = typeof TypeProduct[keyof typeof TypeProduct];
 
 export const Category = {
-    ELECTRICITY: 'ELECTRICITY',
+    ELECTRICAL: 'ELECTRICAL',
+    MECHANICAL: 'MECHANICAL',
     PLUMBING: 'PLUMBING',
     ELECTRONICS: 'ELECTRONICS',
+    INDUSTRIAL_SUPPLIES: 'INDUSTRIAL_SUPPLIES',
 } as const;
 export type Category = typeof Category[keyof typeof Category];
 
