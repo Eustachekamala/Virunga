@@ -27,8 +27,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 {/* Logo/Header */}
                 <div className="p-8 border-b border-white/10">
                     <h1 className="text-2xl font-serif font-bold text-gold flex items-center gap-3">
-                        <Package className="w-8 h-8" />
-                        Virunga Product
+                        Virunga Products
                     </h1>
                     <p className="text-sm text-white/60 mt-1 ml-11">Manufacturing Equipment</p>
                 </div>

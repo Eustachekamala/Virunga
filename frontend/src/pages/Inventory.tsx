@@ -13,6 +13,11 @@ import {
 } from '../services/api';
 import { TypeProduct, Category } from '../types';
 import type { CreateProductDTO, Product } from '../types';
+import { generateLowStockInventoryReport, generateInventoryReport } from '../services/pdfGenerator';
+import {
+    Plus,
+    FileDown,
+} from 'lucide-react';
 
 const Inventory = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -85,6 +90,14 @@ const Inventory = () => {
         setIsModalOpen(true);
     };
 
+    const handleExportPDF = () => {
+        if (viewMode === 'LOW_STOCK') {
+            generateLowStockInventoryReport(products);
+        } else {
+            generateInventoryReport(products);
+        }
+    };
+
     return (
         <div>
             {/* Header Section */}
@@ -98,7 +111,7 @@ const Inventory = () => {
                     </p>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 flex-wrap">
                     <button
                         onClick={() => setViewMode(viewMode === 'ALL' ? 'LOW_STOCK' : 'ALL')}
                         className={`px-5 py-2.5 rounded-lg font-medium transition-all shadow-sm border border-cocoa/10 cursor-pointer ${viewMode === 'LOW_STOCK'
@@ -109,11 +122,20 @@ const Inventory = () => {
                         {viewMode === 'LOW_STOCK' ? 'Show All' : 'Low Stock'}
                     </button>
 
+                    {products.length > 0 && (
+                        <button
+                            onClick={handleExportPDF}
+                            className="px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-700 rounded-lg font-medium transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                        >
+                            <FileDown className="w-5 h-5" /> Export PDF
+                        </button>
+                    )}
+
                     <button
                         onClick={openCreateModal}
                         className="px-6 py-2.5 bg-gold text-cocoa hover:bg-yellow-500 rounded-lg font-bold tracking-wide transition-all shadow-lg shadow-gold/20 flex items-center gap-2 cursor-pointer"
                     >
-                        <span>+</span> New Product
+                        <Plus className="w-5 h-5" /> New Product
                     </button>
                 </div>
             </div>

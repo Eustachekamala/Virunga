@@ -3,7 +3,7 @@ import { getWeeklySummary } from '../services/stockMovements';
 import { generateWeeklyStockReport } from '../services/pdfGenerator';
 import { showSuccess } from '../components/ui/Toast';
 import { format } from 'date-fns';
-import { CalendarDays, FileDown, TrendingUp, TrendingDown } from 'lucide-react';
+import { CalendarDays, FileDown, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 
 import type { WeeklySummary } from '../types/movements';
 import {
@@ -145,7 +145,7 @@ const WeeklyViews = () => {
                             : 'text-cocoa/60 hover:bg-cocoa/5'
                             }`}
                     >
-                        📥 Entries ({totalEntries})
+                        <ArrowUpCircle className="w-5 h-5" /> Entries ({totalEntries})
                     </button>
                     <button
                         onClick={() => setActiveTab('exits')}
@@ -154,7 +154,7 @@ const WeeklyViews = () => {
                             : 'text-cocoa/60 hover:bg-cocoa/5'
                             }`}
                     >
-                        📤 Exits ({totalExits})
+                        <ArrowDownCircle className="w-5 h-5" /> Exits ({totalExits})
                     </button>
                 </div>
 

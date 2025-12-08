@@ -281,3 +281,59 @@ export const generateInventoryReport = (products: Product[]): void => {
 
     doc.save(`inventory_report_${format(new Date(), 'yyyyMMdd')}.pdf`);
 };
+
+// Low Stock Inventory Report - with remaining stock details
+export const generateLowStockInventoryReport = (products: Product[]): void => {
+    const doc = new jsPDF();
+    addCompanyHeader(doc, 'Low Stock Inventory Report');
+
+    const totalProducts = products.length;
+    const totalQuantity = products.reduce((sum, p) => sum + p.quantity, 0);
+    const outOfStockCount = products.filter(p => p.quantity === 0).length;
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Low Stock Summary', 20, 65);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Total Low Stock Items: ${totalProducts}`, 20, 72);
+    doc.text(`Total Remaining Units: ${totalQuantity}`, 20, 79);
+    doc.text(`Out of Stock Items: ${outOfStockCount}`, 20, 86);
+
+    if (products.length > 0) {
+        autoTable(doc, {
+            startY: 95,
+            head: [['Product Name', 'Type', 'Current Stock', 'Threshold', 'Units Remaining', 'Status']],
+            body: products.map(p => [
+                p.name,
+                p.typeProduct,
+                p.quantity.toString(),
+                (p.stockAlertThreshold || 10).toString(),
+                (p.quantity - (p.stockAlertThreshold || 10)).toString(),
+                p.quantity === 0 ? 'OUT OF STOCK' :
+                    (p.quantity < (p.stockAlertThreshold || 10) ? 'CRITICAL' : 'LOW')
+            ]),
+            theme: 'grid',
+            headStyles: { fillColor: [220, 38, 38], textColor: [255, 255, 255] },
+            styles: { fontSize: 9 },
+            rowPageBreak: 'auto',
+            didParseCell: function (data) {
+                if (data.row.section === 'body' && data.column.index === 5) {
+                    if (data.cell.raw === 'OUT OF STOCK') {
+                        data.cell.styles.textColor = [220, 38, 38];
+                        data.cell.styles.fontStyle = 'bold';
+                    } else if (data.cell.raw === 'CRITICAL') {
+                        data.cell.styles.textColor = [251, 146, 60];
+                        data.cell.styles.fontStyle = 'bold';
+                    } else if (data.cell.raw === 'LOW') {
+                        data.cell.styles.textColor = [234, 179, 8];
+                    }
+                }
+            }
+        });
+    } else {
+        doc.setTextColor(16, 185, 129);
+        doc.text('✓ All products are adequately stocked!', 20, 100);
+    }
+
+    doc.save(`low_stock_inventory_${format(new Date(), 'yyyyMMdd')}.pdf`);
+};

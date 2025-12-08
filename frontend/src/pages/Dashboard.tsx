@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { getProducts, getLowStockProducts } from '../services/api';
 import type { Product } from '../types';
+import { AlertTriangle, BarChart2, Package, Tag } from 'lucide-react';
 
 const Dashboard = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -65,21 +66,21 @@ const Dashboard = () => {
                 <StatCard
                     title="Total Products"
                     value={products.length}
-                    icon="📦"
+                    icon={<Package className="w-5 h-5" />}
                     bg="bg-cocoa"
                     textColor="text-gold"
                 />
                 <StatCard
                     title="Low Stock Alerts"
                     value={lowStockCount}
-                    icon="⚠"
+                    icon={<AlertTriangle className="w-5 h-5" />}
                     bg="bg-red-600"
                     textColor="text-white"
                 />
                 <StatCard
                     title="Total Inventory Size"
                     value={totalQuantity}
-                    icon="📊"
+                    icon={<BarChart2 className="w-5 h-5" />}
                     bg="bg-forest"
                     textColor="text-white"
                 />
@@ -87,7 +88,7 @@ const Dashboard = () => {
                     title="Product Types"
                     value={`${consumables} / ${nonConsumables}`}
                     subtitle="Consumable / Non"
-                    icon="🏷"
+                    icon={<Tag className="w-5 h-5" />}
                     bg="bg-white"
                     textColor="text-cocoa"
                     border

@@ -6,6 +6,7 @@ import { showSuccess } from '../components/ui/Toast';
 import { format } from 'date-fns';
 import type { StockMovement, MovementFilter } from '../types/movements';
 import type { Product } from '../types';
+import { ArrowDownCircleIcon, ArrowUpCircleIcon, FileDown, Filter } from 'lucide-react';
 
 const History = () => {
     const [movements, setMovements] = useState<StockMovement[]>([]);
@@ -89,19 +90,19 @@ const History = () => {
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className={`px-5 py-2 rounded-lg font-medium transition-all border ${hasActiveFilters
+                        className={`flex items-center gap-2 px-5 py-2 rounded-lg font-medium transition-all border ${hasActiveFilters
                             ? 'bg-gold text-cocoa border-gold'
                             : 'bg-white text-cocoa border-cocoa/20 hover:bg-cocoa/5'
                             }`}
                     >
-                        🔍 Filters {hasActiveFilters && `(${Object.values(filters).filter(v => v).length})`}
+                        <Filter className="w-5 h-5" /> Filters {hasActiveFilters && `(${Object.values(filters).filter(v => v).length})`}
                     </button>
                     <button
                         onClick={handleExport}
                         disabled={movements.length === 0}
-                        className="px-5 py-2 bg-cocoa text-gold hover:bg-cocoa/90 rounded-lg font-medium transition-all disabled:opacity-50 flex items-center gap-2"
+                        className={ `flex items-center gap-2 px-5 py-2 bg-cocoa text-gold hover:bg-cocoa/90 rounded-lg font-medium transition-all disabled:opacity-50 ${movements.length === 0 ? 'opacity-50' : ''}`}
                     >
-                        <span>📄</span> Export PDF
+                        <FileDown className="w-5 h-5" /> Export PDF
                     </button>
                 </div>
             </div>
@@ -246,11 +247,21 @@ const History = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${movement.type === 'ENTREE'
+                                            <span className={`flex items-center gap-2 justify-center px-3 py-1 w-20 rounded-full text-xs font-medium ${movement.type === 'ENTREE'
                                                 ? 'bg-green-100 text-green-700'
                                                 : 'bg-orange-100 text-orange-700'
                                                 }`}>
-                                                {movement.type === 'ENTREE' ? '📥 IN' : '📤 OUT'}
+                                                {movement.type === 'ENTREE' ? (
+                                                    <>
+                                                        <ArrowUpCircleIcon className="w-4 h-4" />
+                                                        <span>IN</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <ArrowDownCircleIcon className="w-4 h-4" />
+                                                        <span>OUT</span>
+                                                    </>
+                                                )}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-sm font-medium text-cocoa">
