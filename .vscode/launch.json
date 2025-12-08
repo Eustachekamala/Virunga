@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ProductApplication<virunga>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.eustache.virunga.ProductApplication",
+            "projectName": "virunga",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
