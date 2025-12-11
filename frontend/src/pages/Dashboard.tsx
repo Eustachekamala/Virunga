@@ -95,7 +95,7 @@ const Dashboard = () => {
                 />
             </div>
 
-            {/* Charts */}
+             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Inventory Distribution */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-cocoa/5">
@@ -144,6 +144,7 @@ const Dashboard = () => {
     );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const StatCard = ({ title, value, subtitle, icon, bg, textColor, border }: any) => (
     <div className={`p-6 rounded-xl shadow-sm ${bg} ${border ? 'border border-cocoa/10' : ''}`}>
         <div className="flex justify-between items-start">
