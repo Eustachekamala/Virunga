@@ -28,6 +28,9 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
 
     const [file, setFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const mobileFileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     // ----------------------
     // CAMERA STATE
@@ -317,14 +320,32 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                                 </div>
 
                                 {/* Camera */}
-                                <button
-                                    type="button"
-                                    onClick={startCamera}
-                                    className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-dashed border-green-300 rounded-lg p-6 flex flex-col items-center"
-                                >
-                                    <Camera className="w-8 h-8 text-green-600 mb-2" />
-                                    <span className="text-green-700 text-sm">Take Photo</span>
-                                </button>
+                                <div>
+                                    <input
+                                        ref={mobileFileInputRef}
+                                        id="file-capture"
+                                        type="file"
+                                        accept="image/*"
+                                        capture="environment"
+                                        className="hidden"
+                                        onChange={handleFileChange}
+                                    />
+
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (isMobile) {
+                                                mobileFileInputRef.current?.click();
+                                            } else {
+                                                startCamera();
+                                            }
+                                        }}
+                                        className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-dashed border-green-300 rounded-lg p-6 flex flex-col items-center"
+                                    >
+                                        <Camera className="w-8 h-8 text-green-600 mb-2" />
+                                        <span className="text-green-700 text-sm">Take Photo</span>
+                                    </button>
+                                </div>
                             </div>
                         )}
 
