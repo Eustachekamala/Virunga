@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from 'zustand';
 import { Product, CreateProductDTO, TypeProduct } from '../types';
 import * as productsAPI from '../api/products';

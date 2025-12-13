@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import ProductCard from '../components/ProductCard';
 import ProductModal from '../components/ProductModal';
 import {
@@ -74,22 +74,23 @@ const Inventory = () => {
         fetchProducts();
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = useCallback(async (id: number) => {
         if (confirm('Are you sure you want to delete this product?')) {
             await deleteProduct(id);
-            fetchProducts();
+            // update local list to avoid refetching entire list and reduce render churn
+            setProducts(prev => prev.filter(p => p.id !== id));
         }
-    };
+    }, []);
 
-    const openCreateModal = () => {
+    const openCreateModal = useCallback(() => {
         setEditingProduct(null);
         setIsModalOpen(true);
-    };
+    }, []);
 
-    const openEditModal = (product: Product) => {
+    const openEditModal = useCallback((product: Product) => {
         setEditingProduct(product);
         setIsModalOpen(true);
-    };
+    }, []);
 
     const handleExportPDF = () => {
         if (viewMode === 'LOW_STOCK') {

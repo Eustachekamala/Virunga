@@ -14,7 +14,8 @@ import {
 } from 'lucide-react';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-    const { lowStockProducts, fetchLowStockProducts } = useProductStore();
+    const lowStockProducts = useProductStore(state => state.lowStockProducts);
+    const fetchLowStockProducts = useProductStore(state => state.fetchLowStockProducts);
 
     useEffect(() => {
         fetchLowStockProducts();

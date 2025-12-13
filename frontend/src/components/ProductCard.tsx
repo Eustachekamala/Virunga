@@ -21,6 +21,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onDelete, onEdit }) 
                                 : `${API_BASE_URL.replace('/api/v1', '')}/uploads/${product.imageFile}`
                         }
                         alt={product.name}
+                        loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
                 ) : (
@@ -93,4 +94,4 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onDelete, onEdit }) 
     );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);
