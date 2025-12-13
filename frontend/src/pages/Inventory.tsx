@@ -61,6 +61,7 @@ const Inventory = () => {
             fetchProducts();
         }, 500); // Debounce 500ms
         return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery, selectedType, selectedCategory, viewMode]);
 
 

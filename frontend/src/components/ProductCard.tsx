@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Product } from '../types';
+import { API_BASE_URL } from '../api/client';
 
 interface ProductCardProps {
     product: Product;
@@ -13,7 +14,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onDelete, onEdit }) 
             <div className="h-56 relative overflow-hidden bg-cream-dark">
                 {product.imageFile ? (
                     <img
-                        src={`/uploads/${product.imageFile}`}
+                        src={
+                            // if imageFile is already a URL, use it; otherwise build absolute URL to backend uploads
+                            product.imageFile.startsWith('http')
+                                ? product.imageFile
+                                : `${API_BASE_URL.replace('/api/v1', '')}/uploads/${product.imageFile}`
+                        }
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     />

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Category, TypeProduct } from '../types';
 import type { CreateProductDTO, Product } from '../types';
 import { Camera, Upload, X } from 'lucide-react';
+import { API_BASE_URL } from '../api/client';
 
 interface ProductModalProps {
     isOpen: boolean;
@@ -54,7 +55,11 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                 });
 
                 if (productToEdit.imageFile) {
-                    setImagePreview(`/uploads/${productToEdit.imageFile}`);
+                    setImagePreview(
+                        productToEdit.imageFile.startsWith('http')
+                            ? productToEdit.imageFile
+                            : `${API_BASE_URL.replace('/api/v1', '')}/uploads/${productToEdit.imageFile}`
+                    );
                 }
             } else {
                 // Reset new form
@@ -74,6 +79,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
         } else {
             stopCamera();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, productToEdit]);
 
     // ----------------------
@@ -97,6 +103,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
             setStream(mediaStream);
             if (videoRef.current) videoRef.current.srcObject = mediaStream;
             setShowCamera(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             let message = 'Could not access camera.';
 
