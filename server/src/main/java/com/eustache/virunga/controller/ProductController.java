@@ -32,7 +32,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "No product found")
     })
-    @GetMapping("allProducts")
+    @GetMapping("/allProducts")
     public ResponseEntity<List<ProductResponseDTO>> getAll() {
         return productService.getAllProducts();
     }
@@ -42,7 +42,7 @@ public class ProductController {
             @ApiResponse(responseCode = "201", description = "Created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid data")
     })
-    @PostMapping(value = "insert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/insert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> createProduct(
             @ModelAttribute ProductDTO productDTO) {
         return productService.createProduct(productDTO);
@@ -53,7 +53,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid type supplied")
     })
-    @GetMapping("type/{type}")
+    @GetMapping("/type/{type}")
     public ResponseEntity<List<ProductResponseDTO>> getProductsByType(
             @PathVariable String type) {
         TypeProduct typeEnum;
@@ -70,7 +70,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid category supplied")
     })
-    @GetMapping("category/{category}")
+    @GetMapping("/category/{category}")
     public ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(
             @PathVariable String category) {
         Category categoryEnum;
@@ -87,7 +87,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Product fetched successfully"),
             @ApiResponse(responseCode = "404", description = "Products with no found")
     })
-    @GetMapping("low-stock")
+    @GetMapping("/low-stock")
     public ResponseEntity<List<ProductResponseDTO>> getLowProductStocks() {
         return productService.getLowStockProducts();
     }
@@ -97,7 +97,7 @@ public class ProductController {
             @ApiResponse(responseCode = "201", description = "Updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid data")
     })
-    @PatchMapping(value = "update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateProduct(
             @PathVariable Integer id,
             @ModelAttribute ProductDTO productDTO) {
@@ -109,7 +109,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "Non product was found")
     })
-    @GetMapping("getByName/{name}")
+    @GetMapping("/getByName/{name}")
     public ResponseEntity<List<ProductResponseDTO>> getProductByName(
             @PathVariable String name) {
         return productService.getProductByName(name);
@@ -120,7 +120,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Product retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "Non product was found")
     })
-    @GetMapping("getById/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<ProductResponseDTO> getProductById(
             @PathVariable Integer id) {
         return productService.getProductById(id);
@@ -131,7 +131,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Product was deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Non product was found")
     })
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProductById(
             @PathVariable Integer id) {
         return productService.deleteProduct(id);
