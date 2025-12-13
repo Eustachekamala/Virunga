@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_BASE_URL = 'http://localhost:8080/api/v1';
+export const API_BASE_URL = 'https://virunga-product-app.onrender.com/api/v1';
 
 // Create axios instance with default config
 export const apiClient = axios.create({
