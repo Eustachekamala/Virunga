@@ -250,34 +250,38 @@ export const generateInventoryReport = (products: Product[]): void => {
     doc.text(`Total Units: ${totalQuantity}`, 20, 79);
     doc.text(`Low Stock Items: ${lowStockCount}`, 20, 86);
 
-    autoTable(doc, {
-        startY: 95,
-        head: [['Product Name', 'Type', 'Quantity', 'Threshold', 'Status']],
-        body: products.map(p => [
-            p.name,
-            p.typeProduct,
-            p.quantity.toString(),
-            (p.stockAlertThreshold || 10).toString(),
-            p.quantity === 0 ? 'OUT' :
-                (p.quantity <= (p.stockAlertThreshold || 10) ? 'LOW' : 'OK')
-        ]),
-        theme: 'grid',
-        headStyles: { fillColor: [46, 24, 16], textColor: [212, 175, 55] },
-        styles: { fontSize: 9 },
-        rowPageBreak: 'auto',
-        didParseCell: function (data) {
-            if (data.row.section === 'body' && data.column.index === 4) {
-                if (data.cell.raw === 'OUT') {
-                    data.cell.styles.textColor = [220, 38, 38];
-                    data.cell.styles.fontStyle = 'bold';
-                } else if (data.cell.raw === 'LOW') {
-                    data.cell.styles.textColor = [234, 179, 8];
-                } else {
-                    data.cell.styles.textColor = [16, 185, 129];
+    if (products.length > 0) {
+        autoTable(doc, {
+            startY: 95,
+            head: [['Product Name', 'Type', 'Quantity', 'Threshold', 'Status']],
+            body: products.map(p => [
+                p.name,
+                p.typeProduct,
+                p.quantity.toString(),
+                (p.stockAlertThreshold || 10).toString(),
+                p.quantity === 0 ? 'OUT' :
+                    (p.quantity <= (p.stockAlertThreshold || 10) ? 'LOW' : 'ADEQUATE')
+            ]),
+            theme: 'grid',
+            headStyles: { fillColor: [46, 24, 16], textColor: [212, 175, 55] },
+            styles: { fontSize: 9 },
+            rowPageBreak: 'auto',
+            didParseCell: function (data) {
+                if (data.row.section === 'body' && data.column.index === 4) {
+                    if (data.cell.raw === 'OUT') {
+                        data.cell.styles.textColor = [220, 38, 38];
+                        data.cell.styles.fontStyle = 'bold';
+                    } else if (data.cell.raw === 'LOW') {
+                        data.cell.styles.textColor = [234, 179, 8];
+                    } else {
+                        data.cell.styles.textColor = [16, 185, 129];
+                    }
                 }
             }
-        }
-    });
+        });
+    } else {
+        doc.text('No products in inventory.', 20, 100);
+    }
 
     doc.save(`inventory_report_${format(new Date(), 'yyyyMMdd')}.pdf`);
 };
