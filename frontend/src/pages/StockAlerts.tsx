@@ -167,6 +167,7 @@ const StockAlerts = () => {
     );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const AlertCard = ({ alert, navigate }: { alert: StockAlert; navigate: any }) => {
     const severityColors = {
         OUT_OF_STOCK: 'border-red-400 bg-gradient-to-r from-red-50 to-red-100 hover:from-red-100 hover:to-red-150',

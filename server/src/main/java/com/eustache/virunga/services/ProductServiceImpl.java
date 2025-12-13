@@ -93,16 +93,16 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO) {
         try {
             Product existingProduct = productDAO.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id)); // A
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
 
-            // B: Safe update logic using Optional
+            // Safe update logic using Optional
             Optional.ofNullable(productDTO.getName()).ifPresent(existingProduct::setName);
             Optional.ofNullable(productDTO.getCategory()).ifPresent(existingProduct::setCategory);
             Optional.ofNullable(productDTO.getDescription()).ifPresent(existingProduct::setDescription);
             Optional.ofNullable(productDTO.getQuantity()).ifPresent(existingProduct::setQuantity);
             Optional.ofNullable(productDTO.getTypeProduct()).ifPresent(existingProduct::setTypeProduct);
 
-            // C: Image file handling
+            // Image file handling
             if (productDTO.getImageFile() != null && !productDTO.getImageFile().isEmpty()) {
                 String newImageFile = fileStorageService.saveImage(productDTO.getImageFile());
                 // It is VITAL that newImageFile is not null/invalid here.
@@ -110,7 +110,7 @@ public class ProductServiceImpl implements ProductService {
                 Optional.ofNullable(newImageFile).ifPresent(existingProduct::setImageFile);
             }
 
-            // D: To update the status and save
+            // To update the status and save
             updateProductStatus(existingProduct);
             productDAO.save(existingProduct);
             
@@ -120,12 +120,12 @@ public class ProductServiceImpl implements ProductService {
             return new ResponseEntity<>("Product updated successfully", HttpStatus.OK);
 
         } catch (IllegalArgumentException ex) {
-            // Handles case A: Product not found
+            // Handles Product not found
             log.error("Product not found: {}", ex.getMessage());
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404
             
         } catch (DataIntegrityViolationException ex) {
-            // Handles case E: Duplicate name, etc.
+            // Handles Duplicate name, etc.
             log.error("Data integrity violation during update: {}", ex.getMessage());
             return new ResponseEntity<>("Update failed: A field violates a unique constraint (e.g., duplicate name).", HttpStatus.CONFLICT); // Return 409
             
@@ -285,13 +285,12 @@ public class ProductServiceImpl implements ProductService {
         try {
             List<ProductResponseDTO> lowStockProducts = productDAO.findAll()
                     .stream()
-                    .filter(p -> p.getQuantity() != null && p.getStockAlertThreshold() != null
-                            && p.getQuantity() <= p.getStockAlertThreshold())
+                    .filter(p -> p.getQuantity() != null && p.getQuantity() <= DEFAULT_STOCK_ALERT_THRESHOLD)
                     .map(productMapper::toDto)
                     .collect(Collectors.toList());
 
             if (!lowStockProducts.isEmpty()) {
-                // log.warn("Low stock products: {}", lowStockProducts);
+                log.warn("Low stock products: {}", lowStockProducts);
             }
 
             return new ResponseEntity<>(lowStockProducts, HttpStatus.OK);
@@ -339,7 +338,7 @@ public class ProductServiceImpl implements ProductService {
      * based on their current stock levels. This method runs asynchronously.
      */
     @Async
-    @Scheduled(fixedRate = 3600000) // every 1 hour (3600 * 1000 ms)
+    @Scheduled(cron = "0 0 */12 * * *") // every 12 hours
     public void scheduledLowStockCheck() {
         log.info("Running scheduled low stock check...");
 
