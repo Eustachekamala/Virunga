@@ -2,7 +2,7 @@ import axios from 'axios';
 import { TypeProduct, Category } from '../types';
 import type { CreateProductDTO, Product } from '../types';
 
-const API_BASE_URL = '/api/v1/products';
+const API_BASE_URL = '/products';
 
 // Axios instance without default Content-Type
 const api = axios.create();
