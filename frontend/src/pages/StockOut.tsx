@@ -3,7 +3,7 @@ import { getProducts, updateProduct } from '../services/api';
 import { addStockExit } from '../services/stockMovements';
 import { showSuccess, showError, showWarning } from '../components/ui/Toast';
 import type { Product } from '../types';
-import { ArrowUpCircle, Package, Calendar, User, Building, FileText, StickyNote, Send, AlertTriangle, TrendingDown } from 'lucide-react';
+import { ArrowUpCircle, Package, Calendar, User, Building, FileText, StickyNote, Send, AlertTriangle, TrendingDown, Info, Loader2 } from 'lucide-react';
 
 const StockOut = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -115,44 +115,60 @@ const StockOut = () => {
         (selectedProduct.quantity - formData.quantity) <= (selectedProduct.stockAlertThreshold || 10);
 
     return (
-        <div className="max-w-4xl mx-auto px-4 py-6">
-            <div className="mb-8">
-                <h2 className="md:text-4xl text-2xl font-serif font-bold text-cocoa flex items-center gap-3">
-                    <ArrowUpCircle className="w-8 h-8 md:w-10 md:h-10 text-orange-600" />
-                    Stock OUT (Sortie)
-                </h2>
-                <p className="text-cocoa/60 mt-2">Register equipment and materials taken from warehouse</p>
+        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20">
+            {/* HEADER */}
+            <div className="flex items-center gap-4">
+                <div className="p-3 bg-red-500/10 rounded-2xl">
+                    <ArrowUpCircle className="w-8 h-8 text-red-600" />
+                </div>
+                <div>
+                    <h2 className="text-3xl font-bold text-cocoa tracking-tight">
+                        Stock Out
+                    </h2>
+                    <p className="text-cocoa/60 font-medium text-sm">
+                        Record material usage (Sortie)
+                    </p>
+                </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg border border-cocoa/5 p-6 md:p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="glass-panel p-6 md:p-8 rounded-3xl relative overflow-hidden">
+                {/* Decorative background element */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+
+                <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
                     {/* Product Selection */}
-                    <div>
-                        <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
-                            <Package className="w-4 h-4 text-orange-600" />
-                            Product / Material <span className="text-red-600">*</span>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                            <Package className="w-4 h-4 text-red-600" />
+                            Product <span className="text-red-500">*</span>
                         </label>
-                        <select
-                            required
-                            value={formData.productId}
-                            onChange={(e) => setFormData({ ...formData, productId: parseInt(e.target.value) })}
-                            className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 outline-none text-base transition-all"
-                        >
-                            <option value={0}>Select a product...</option>
-                            {products.map(product => (
-                                <option key={product.id} value={product.id}>
-                                    {product.name} (Available: {product.quantity})
-                                </option>
-                            ))}
-                        </select>
+                        <div className="relative">
+                            <select
+                                required
+                                value={formData.productId}
+                                onChange={(e) => setFormData({ ...formData, productId: parseInt(e.target.value) })}
+                                className="w-full pl-4 pr-10 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-red-500/50 outline-none text-base transition-all appearance-none shadow-sm font-medium"
+                            >
+                                <option value={0}>Select a product to remove...</option>
+                                {products.length === 0 && (
+                                    <option disabled>No products found</option>
+                                )}
+                                {products.map(product => (
+                                    <option key={product.id} value={product.id}>
+                                        {product.name} (Available: {product.quantity})
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none border-t-[5px] border-t-cocoa/30 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent"></div>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Quantity */}
-                        <div>
-                            <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
-                                <TrendingDown className="w-4 h-4 text-orange-600" />
-                                Quantity <span className="text-red-600">*</span>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                                <TrendingDown className="w-4 h-4 text-red-600" />
+                                Quantity <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="number"
@@ -161,26 +177,26 @@ const StockOut = () => {
                                 max={selectedProduct?.quantity || 999999}
                                 value={formData.quantity || ''}
                                 onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
-                                className={`w-full px-4 py-3 bg-cream border rounded-lg text-cocoa focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 outline-none text-base transition-all ${isInsufficientStock ? 'border-red-500 bg-red-50' : 'border-cocoa/10'
+                                className={`w-full px-4 py-4 bg-white border rounded-xl text-cocoa focus:ring-2 focus:ring-red-500/50 outline-none text-base transition-all shadow-sm ${isInsufficientStock ? 'border-red-500 bg-red-50' : 'border-cocoa/10'
                                     }`}
-                                placeholder="Enter quantity"
+                                placeholder="0"
                             />
                             {selectedProduct && formData.quantity > 0 && (
-                                <div className="mt-2">
+                                <div className="mt-2 text-xs">
                                     {isInsufficientStock ? (
-                                        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg font-medium">
+                                        <div className="flex items-center gap-2 text-red-600 bg-red-50 px-3 py-2 rounded-lg font-bold border border-red-200">
                                             <AlertTriangle className="w-4 h-4" />
                                             Insufficient stock! Available: {selectedProduct.quantity}
                                         </div>
                                     ) : (
-                                        <div className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg ${willBeLowStock
-                                            ? 'text-orange-600 bg-orange-50'
-                                            : 'text-green-600 bg-green-50'
+                                        <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border font-medium ${willBeLowStock
+                                            ? 'text-orange-700 bg-orange-50 border-orange-200'
+                                            : 'text-green-700 bg-green-50 border-green-200'
                                             }`}>
-                                            {willBeLowStock ? <AlertTriangle className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                                            <span className="font-medium">
-                                                Remaining: {selectedProduct.quantity - formData.quantity} units
-                                                {willBeLowStock && ' ⚠️ Low stock warning'}
+                                            {willBeLowStock ? <AlertTriangle className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                                            <span>
+                                                Remaining: <span className="font-bold">{selectedProduct.quantity - formData.quantity}</span> units
+                                                {willBeLowStock && ' (Low Stock Warning)'}
                                             </span>
                                         </div>
                                     )}
@@ -189,97 +205,101 @@ const StockOut = () => {
                         </div>
 
                         {/* Date */}
-                        <div>
-                            <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-orange-600" />
-                                Date <span className="text-red-600">*</span>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-red-600" />
+                                Date <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="date"
                                 required
                                 value={formData.date}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 outline-none text-base transition-all"
+                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-red-500/50 outline-none text-base transition-all shadow-sm"
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Receiver */}
-                        <div>
-                            <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
-                                <User className="w-4 h-4 text-orange-600" />
-                                Receiver / Worker Name
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                                <User className="w-4 h-4 text-red-600" />
+                                Receiver Name
                             </label>
                             <input
                                 type="text"
                                 value={formData.receiver}
                                 onChange={(e) => setFormData({ ...formData, receiver: e.target.value })}
-                                className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 outline-none text-base transition-all"
+                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-red-500/50 outline-none text-base transition-all shadow-sm placeholder:text-cocoa/30"
                                 placeholder="Who is taking this?"
                             />
                         </div>
 
                         {/* User/Department */}
-                        <div>
-                            <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
-                                <Building className="w-4 h-4 text-orange-600" />
-                                Department / Team
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                                <Building className="w-4 h-4 text-red-600" />
+                                Department
                             </label>
                             <input
                                 type="text"
                                 value={formData.user}
                                 onChange={(e) => setFormData({ ...formData, user: e.target.value })}
-                                className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 outline-none text-base transition-all"
-                                placeholder="e.g., Production, Maintenance"
+                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-red-500/50 outline-none text-base transition-all shadow-sm placeholder:text-cocoa/30"
+                                placeholder="e.g. Production"
                             />
                         </div>
                     </div>
 
                     {/* Purpose */}
-                    <div>
-                        <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-orange-600" />
-                            Purpose / Usage
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-red-600" />
+                            Purpose
                         </label>
                         <input
                             type="text"
                             value={formData.purpose}
                             onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                            className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 outline-none text-base transition-all"
-                            placeholder="e.g., Machine repair, Daily operations, Installation"
+                            className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-red-500/50 outline-none text-base transition-all shadow-sm placeholder:text-cocoa/30"
+                            placeholder="e.g. Machine repair"
                         />
                     </div>
 
                     {/* Notes */}
-                    <div>
-                        <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
-                            <StickyNote className="w-4 h-4 text-orange-600" />
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                            <StickyNote className="w-4 h-4 text-red-600" />
                             Additional Notes
                         </label>
                         <textarea
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             rows={3}
-                            className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 outline-none text-base resize-none transition-all"
+                            className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-red-500/50 outline-none text-base resize-none transition-all shadow-sm placeholder:text-cocoa/30"
                             placeholder="Any additional information..."
                         />
                     </div>
 
                     {/* Submit Button */}
-                    <div className="flex flex-col md:flex-row gap-4 pt-4">
+                    <div className="flex flex-col md:flex-row gap-4 pt-4 border-t border-cocoa/5">
                         <button
                             type="submit"
-                            disabled={submitting || !formData.productId || formData.quantity <= 0 || isInsufficientStock}
-                            className="w-full md:flex-1 px-8 py-4 bg-gradient-to-r from-orange-600 to-orange-700 text-white hover:from-orange-700 hover:to-orange-800 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            disabled={submitting || !formData.productId || formData.quantity <= 0 || !!isInsufficientStock}
+                            className="w-full md:flex-1 px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95"
                         >
-                            <Send className="w-5 h-5" />
-                            {submitting ? 'Recording...' : 'Register Stock Exit'}
+                            {submitting ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                <Send className="w-5 h-5" />
+                            )}
+                            {submitting ? 'Recording...' : 'Confirm Exit'}
                         </button>
                         <button
                             type="button"
                             onClick={() => window.history.back()}
-                            className="w-full md:w-auto px-8 py-4 bg-white border-2 border-cocoa/20 text-cocoa hover:bg-cocoa/5 rounded-xl font-medium text-lg transition-all"
+                            className="w-full md:w-auto px-8 py-4 bg-white border border-cocoa/10 text-cocoa hover:bg-cocoa/5 rounded-xl font-bold text-lg transition-all active:scale-95"
                         >
                             Cancel
                         </button>
@@ -288,21 +308,17 @@ const StockOut = () => {
             </div>
 
             {/* Info Box */}
-            <div className="mt-6 bg-gradient-to-r from-orange-50 to-amber-50 border-l-4 border-orange-500 rounded-xl p-6 shadow-md">
-                <div className="flex gap-3">
-                    <div className="bg-orange-100 p-2 rounded-lg h-fit">
-                        <AlertTriangle className="w-6 h-6 text-orange-600" />
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-orange-900 mb-2">Stock Exit Information</h4>
-                        <ul className="text-sm text-orange-800 space-y-1">
-                            <li>• This form records materials or equipment leaving the warehouse</li>
-                            <li>• The product quantity will be automatically decreased</li>
-                            <li>• You cannot exit more than the available stock</li>
-                            <li>• Low stock warnings will appear if threshold is reached</li>
-                            <li>• All exits are logged for tracking and accountability</li>
-                        </ul>
-                    </div>
+            <div className="bg-red-50/50 border border-red-100 rounded-2xl p-6 flex flex-col md:flex-row gap-4">
+                <div className="bg-red-100 p-3 rounded-xl h-fit w-fit">
+                    <Info className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                    <h4 className="font-bold text-red-900 mb-2">About Stock Exits</h4>
+                    <ul className="text-sm text-red-800/80 space-y-1 list-disc list-inside">
+                        <li>This action reduces quantities from your inventory.</li>
+                        <li>You cannot exit more than the available stock.</li>
+                        <li>Low stock warnings will appear if threshold is reached.</li>
+                    </ul>
                 </div>
             </div>
         </div>

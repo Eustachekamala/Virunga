@@ -6,7 +6,7 @@ import { showSuccess } from '../components/ui/Toast';
 import { format } from 'date-fns';
 import type { StockMovement, MovementFilter } from '../types/movements';
 import type { Product } from '../types';
-import { ArrowDownCircleIcon, ArrowUpCircleIcon, FileDown, Filter } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, FileDown, Filter, Search, Calendar, Package, RefreshCw, ChevronDown } from 'lucide-react';
 
 const History = () => {
     const [movements, setMovements] = useState<StockMovement[]>([]);
@@ -47,7 +47,6 @@ const History = () => {
 
     const handleFilter = () => {
         fetchMovements();
-        setShowFilters(false);
     };
 
     const handleClearFilters = () => {
@@ -78,244 +77,255 @@ const History = () => {
     const hasActiveFilters = Object.values(filters).some(v => v);
 
     return (
-        <div>
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h2 className="text-4xl font-serif font-bold text-cocoa">Movement History</h2>
-                    <p className="text-cocoa/60 mt-2">
-                        {movements.length} total movements {hasActiveFilters && '(filtered)'}
+                    <h2 className="text-3xl font-bold text-cocoa tracking-tight">Movement History</h2>
+                    <p className="text-cocoa/60 font-medium text-sm mt-1">
+                        Track every stock change over time
                     </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 w-full md:w-auto">
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className={`flex items-center gap-2 px-5 py-2 rounded-lg font-medium transition-all border ${hasActiveFilters
-                            ? 'bg-gold text-cocoa border-gold'
-                            : 'bg-white text-cocoa border-cocoa/20 hover:bg-cocoa/5'
+                        className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold transition-all border ${hasActiveFilters
+                            ? 'bg-gold/10 text-cocoa border-gold shadow-sm'
+                            : 'bg-white text-cocoa border-cocoa/10 hover:bg-cocoa/5 shadow-sm'
                             }`}
                     >
-                        <Filter className="w-5 h-5" /> Filters {hasActiveFilters && `(${Object.values(filters).filter(v => v).length})`}
+                        <Filter className="w-5 h-5" />
+                        <span className="hidden sm:inline">Filters</span>
+                        {hasActiveFilters && <span className="bg-cocoa text-white text-xs px-2 py-0.5 rounded-full ml-1">{Object.values(filters).filter(v => v).length}</span>}
                     </button>
                     <button
                         onClick={handleExport}
                         disabled={movements.length === 0}
-                        className={`flex items-center gap-2 px-5 py-2 bg-cocoa text-gold hover:bg-cocoa/90 rounded-lg font-medium transition-all disabled:opacity-50 ${movements.length === 0 ? 'opacity-50' : ''}`}
+                        className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-cocoa text-gold hover:bg-cocoa/90 rounded-xl font-bold transition-all shadow-lg shadow-cocoa/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                        <FileDown className="w-5 h-5" /> Export PDF
+                        <FileDown className="w-5 h-5" />
+                        <span className="hidden sm:inline">Export PDF</span>
                     </button>
                 </div>
             </div>
 
             {/* Filter Panel */}
-            {showFilters && (
-                <div className="bg-white rounded-xl shadow-sm border border-cocoa/5 p-6 mb-8">
-                    <h3 className="text-lg font-bold text-cocoa mb-4">Filter Movements</h3>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showFilters ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className="glass-panel p-6 rounded-2xl border border-cocoa/5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                         {/* Search */}
-                        <div className="lg:col-span-3">
-                            <label className="block text-sm font-medium text-cocoa mb-2">Search</label>
+                        <div className="lg:col-span-3 space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                                <Search className="w-4 h-4" />
+                                Search
+                            </label>
                             <input
                                 type="text"
                                 value={filters.searchTerm || ''}
                                 onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
                                 placeholder="Search by product, reference, supplier, notes..."
-                                className="w-full px-4 py-2 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-gold/50 outline-none"
+                                className="w-full px-4 py-3 bg-white/80 border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-gold/50 outline-none transition-all placeholder:text-cocoa/40"
                             />
                         </div>
 
-                        {/* Start Date */}
-                        <div>
-                            <label className="block text-sm font-medium text-cocoa mb-2">Start Date</label>
+                        {/* Dates */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                                <Calendar className="w-4 h-4" />
+                                Start Date
+                            </label>
                             <input
                                 type="date"
                                 value={filters.startDate || ''}
                                 onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-                                className="w-full px-4 py-2 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-gold/50 outline-none"
+                                className="w-full px-4 py-3 bg-white/80 border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-gold/50 outline-none transition-all"
                             />
                         </div>
-
-                        {/* End Date */}
-                        <div>
-                            <label className="block text-sm font-medium text-cocoa mb-2">End Date</label>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                                <Calendar className="w-4 h-4" />
+                                End Date
+                            </label>
                             <input
                                 type="date"
                                 value={filters.endDate || ''}
                                 onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-                                className="w-full px-4 py-2 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-gold/50 outline-none"
+                                className="w-full px-4 py-3 bg-white/80 border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-gold/50 outline-none transition-all"
                             />
                         </div>
 
                         {/* Product */}
-                        <div>
-                            <label className="block text-sm font-medium text-cocoa mb-2">Product</label>
-                            <select
-                                value={filters.productId || ''}
-                                onChange={(e) => setFilters({ ...filters, productId: e.target.value ? parseInt(e.target.value) : undefined })}
-                                className="w-full px-4 py-2 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-gold/50 outline-none"
-                            >
-                                <option value="">All Products</option>
-                                {products.map(p => (
-                                    <option key={p.id} value={p.id}>{p.name}</option>
-                                ))}
-                            </select>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                                <Package className="w-4 h-4" />
+                                Product
+                            </label>
+                            <div className="relative">
+                                <select
+                                    value={filters.productId || ''}
+                                    onChange={(e) => setFilters({ ...filters, productId: e.target.value ? parseInt(e.target.value) : undefined })}
+                                    className="w-full px-4 py-3 bg-white/80 border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-gold/50 outline-none transition-all appearance-none"
+                                >
+                                    <option value="">All Products</option>
+                                    {products.map(p => (
+                                        <option key={p.id} value={p.id}>{p.name}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cocoa/40 pointer-events-none" />
+                            </div>
                         </div>
 
                         {/* Type */}
-                        <div>
-                            <label className="block text-sm font-medium text-cocoa mb-2">Movement Type</label>
-                            <select
-                                value={filters.type || ''}
-                                onChange={(e) => setFilters({ ...filters, type: e.target.value as any })}
-                                className="w-full px-4 py-2 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-gold/50 outline-none"
-                            >
-                                <option value="">All Types</option>
-                                <option value="ENTREE">Entries (IN)</option>
-                                <option value="SORTIE">Exits (OUT)</option>
-                            </select>
-                        </div>
-
-                        {/* User */}
-                        <div>
-                            <label className="block text-sm font-medium text-cocoa mb-2">User / Receiver</label>
-                            <input
-                                type="text"
-                                value={filters.user || ''}
-                                onChange={(e) => setFilters({ ...filters, user: e.target.value })}
-                                placeholder="Filter by user name"
-                                className="w-full px-4 py-2 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-gold/50 outline-none"
-                            />
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
+                                <RefreshCw className="w-4 h-4" />
+                                Movement Type
+                            </label>
+                            <div className="relative">
+                                <select
+                                    value={filters.type || ''}
+                                    onChange={(e) => setFilters({ ...filters, type: e.target.value as any })}
+                                    className="w-full px-4 py-3 bg-white/80 border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-gold/50 outline-none transition-all appearance-none"
+                                >
+                                    <option value="">All Types</option>
+                                    <option value="ENTREE">Entries (IN)</option>
+                                    <option value="SORTIE">Exits (OUT)</option>
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cocoa/40 pointer-events-none" />
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 pt-2">
                         <button
                             onClick={handleFilter}
-                            className="px-6 py-2 bg-forest text-white hover:bg-forest/90 rounded-lg font-medium transition-all"
+                            className="px-6 py-2.5 bg-cocoa text-white hover:bg-cocoa/90 rounded-xl font-bold transition-all shadow-md active:scale-95 text-sm"
                         >
                             Apply Filters
                         </button>
                         <button
                             onClick={handleClearFilters}
-                            className="px-6 py-2 bg-white border border-cocoa/20 text-cocoa hover:bg-cocoa/5 rounded-lg font-medium transition-all"
+                            className="px-6 py-2.5 bg-white border border-cocoa/10 text-cocoa hover:bg-cocoa/5 rounded-xl font-bold transition-all text-sm"
                         >
                             Clear All
                         </button>
                     </div>
                 </div>
-            )}
+            </div>
 
             {/* Movements List */}
-            <div className="bg-white rounded-xl shadow-sm border border-cocoa/5">
+            <div className="glass-panel rounded-3xl overflow-hidden border border-cocoa/5 shadow-xl relative min-h-[400px]">
                 {loading ? (
-                    <div className="flex justify-center py-12">
-                        <div className="w-10 h-10 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm z-10">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="w-10 h-10 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
+                            <p className="text-cocoa/60 font-medium">Loading history...</p>
+                        </div>
                     </div>
                 ) : movements.length === 0 ? (
-                    <div className="text-center py-12">
-                        <p className="text-cocoa/60 text-lg">No movements found</p>
+                    <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+                        <div className="w-20 h-20 bg-cocoa/5 rounded-full flex items-center justify-center mb-4">
+                            <RefreshCw className="w-10 h-10 text-cocoa/20" />
+                        </div>
+                        <h3 className="text-xl font-bold text-cocoa mb-2">No movements found</h3>
+                        <p className="text-cocoa/60 max-w-sm mx-auto mb-6">
+                            Try adjusting your filters or record some stock movements to see them here.
+                        </p>
                         {hasActiveFilters && (
                             <button
                                 onClick={handleClearFilters}
-                                className="mt-4 text-gold hover:text-gold/80 font-medium"
+                                className="px-6 py-2 bg-gold/10 text-cocoa font-bold rounded-lg border border-gold hover:bg-gold/20 transition-all"
                             >
                                 Clear filters
                             </button>
                         )}
                     </div>
                 ) : (
-                    <div className="overflow-hidden">
-                        {/* Mobile Card View */}
-                        <div className="md:hidden space-y-4 p-4">
+                    <>
+                        {/* Mobile Card Layout */}
+                        <div className="md:hidden">
                             {movements.map((movement) => (
-                                <div key={movement.id} className="bg-cream/50 border border-cocoa/10 rounded-lg p-4 shadow-sm">
+                                <div key={movement.id} className="p-5 border-b border-cocoa/5 last:border-0 hover:bg-cocoa/[0.02] transition-colors">
                                     <div className="flex justify-between items-start mb-3">
                                         <div>
-                                            <div className="text-cocoa font-bold text-lg">{movement.productName}</div>
-                                            <div className="text-cocoa/50 text-xs">
-                                                {format(new Date(movement.date), 'MMM dd, yyyy HH:mm')}
+                                            <div className="font-bold text-cocoa text-lg leading-tight mb-1">{movement.productName}</div>
+                                            <div className="flex items-center gap-2 text-xs font-medium text-cocoa/50">
+                                                <Calendar className="w-3 h-3" />
+                                                {format(new Date(movement.date), 'MMM dd, yyyy • HH:mm')}
                                             </div>
                                         </div>
-                                        <span className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${movement.type === 'ENTREE'
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-orange-100 text-orange-700'
+                                        <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${movement.type === 'ENTREE'
+                                            ? 'bg-green-100/50 text-green-700 border-green-200'
+                                            : 'bg-red-100/50 text-red-700 border-red-200'
                                             }`}>
-                                            {movement.type === 'ENTREE' ? <ArrowUpCircleIcon className="w-3 h-3" /> : <ArrowDownCircleIcon className="w-3 h-3" />}
+                                            {movement.type === 'ENTREE' ? <ArrowDownCircle className="w-3.5 h-3.5" /> : <ArrowUpCircle className="w-3.5 h-3.5" />}
                                             {movement.type === 'ENTREE' ? 'IN' : 'OUT'}
                                         </span>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2 text-sm text-cocoa/70 mb-3">
+                                    <div className="grid grid-cols-2 gap-4 bg-cocoa/[0.03] rounded-xl p-3 mb-3">
                                         <div>
-                                            <span className="block text-xs text-cocoa/40 uppercase">Qty</span>
-                                            <span className="font-bold text-cocoa">{movement.quantity}</span>
+                                            <span className="block text-[10px] uppercase tracking-wider font-bold text-cocoa/40 mb-0.5">Quantity</span>
+                                            <span className="text-base font-bold text-cocoa">{movement.quantity} units</span>
                                         </div>
                                         <div>
-                                            <span className="block text-xs text-cocoa/40 uppercase">User/Prov</span>
-                                            <span className="truncate block">{movement.supplier || movement.receiver || movement.user || '-'}</span>
+                                            <span className="block text-[10px] uppercase tracking-wider font-bold text-cocoa/40 mb-0.5">User / Ref</span>
+                                            <span className="text-sm font-medium text-cocoa break-words line-clamp-1">{movement.supplier || movement.receiver || movement.user || '-'}</span>
                                         </div>
                                     </div>
 
                                     {(movement.reason || movement.purpose || movement.reference) && (
-                                        <div className="pt-3 border-t border-cocoa/5 text-xs text-cocoa/60">
-                                            {movement.reason || movement.purpose || movement.reference}
+                                        <div className="flex items-start gap-2 text-xs text-cocoa/70 bg-white/50 p-2 rounded-lg border border-cocoa/5">
+                                            <span className="font-bold min-w-fit">Note:</span>
+                                            <span className="italic line-clamp-2">{movement.reason || movement.purpose || movement.reference}</span>
                                         </div>
                                     )}
                                 </div>
                             ))}
                         </div>
 
-                        {/* Desktop Table View */}
+                        {/* Desktop Table Layout */}
                         <div className="hidden md:block overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-cocoa text-cream">
+                            <table className="w-full text-left border-collapse">
+                                <thead className="bg-cocoa text-cream sticky top-0 z-10">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-sm font-medium">Date & Time</th>
-                                        <th className="px-6 py-4 text-left text-sm font-medium">Type</th>
-                                        <th className="px-6 py-4 text-left text-sm font-medium">Product</th>
-                                        <th className="px-6 py-4 text-left text-sm font-medium">Quantity</th>
-                                        <th className="px-6 py-4 text-left text-sm font-medium">User/Supplier</th>
-                                        <th className="px-6 py-4 text-left text-sm font-medium">Details</th>
+                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Date & Time</th>
+                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Type</th>
+                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Product</th>
+                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Qty</th>
+                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">User / Supplier</th>
+                                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Details</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-cocoa/10">
+                                <tbody className="divide-y divide-cocoa/5">
                                     {movements.map((movement) => (
-                                        <tr key={movement.id} className="hover:bg-cocoa/5 transition-colors">
-                                            <td className="px-6 py-4 text-sm text-cocoa">
-                                                <div>
-                                                    <div className="font-medium">{format(new Date(movement.date), 'MMM dd, yyyy')}</div>
-                                                    <div className="text-cocoa/60">{format(new Date(movement.date), 'HH:mm')}</div>
+                                        <tr key={movement.id} className="hover:bg-cocoa/[0.02] transition-colors group">
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-cocoa text-sm">{format(new Date(movement.date), 'MMM dd, yyyy')}</span>
+                                                    <span className="text-xs text-cocoa/50 font-medium">{format(new Date(movement.date), 'HH:mm')}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`flex items-center gap-2 justify-center px-3 py-1 w-20 rounded-full text-xs font-medium ${movement.type === 'ENTREE'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-orange-100 text-orange-700'
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${movement.type === 'ENTREE'
+                                                    ? 'bg-green-100/50 text-green-700 border-green-200'
+                                                    : 'bg-red-100/50 text-red-700 border-red-200'
                                                     }`}>
-                                                    {movement.type === 'ENTREE' ? (
-                                                        <>
-                                                            <ArrowUpCircleIcon className="w-4 h-4" />
-                                                            <span>IN</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <ArrowDownCircleIcon className="w-4 h-4" />
-                                                            <span>OUT</span>
-                                                        </>
-                                                    )}
+                                                    {movement.type === 'ENTREE' ? <ArrowDownCircle className="w-3.5 h-3.5" /> : <ArrowUpCircle className="w-3.5 h-3.5" />}
+                                                    {movement.type === 'ENTREE' ? 'IN' : 'OUT'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-sm font-medium text-cocoa">
-                                                {movement.productName}
+                                            <td className="px-6 py-4">
+                                                <span className="font-bold text-cocoa text-sm">{movement.productName}</span>
                                             </td>
-                                            <td className="px-6 py-4 text-sm font-bold text-cocoa">
-                                                {movement.quantity}
+                                            <td className="px-6 py-4">
+                                                <span className="font-bold text-cocoa/80 bg-cocoa/5 px-2 py-1 rounded-md text-sm">{movement.quantity}</span>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-cocoa/70">
+                                            <td className="px-6 py-4 text-sm text-cocoa/70 font-medium">
                                                 {movement.supplier || movement.receiver || movement.user || '-'}
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-cocoa/70">
+                                            <td className="px-6 py-4 text-sm text-cocoa/60 max-w-xs truncate" title={movement.reason || movement.purpose || movement.reference || ''}>
                                                 {movement.reason || movement.purpose || movement.reference || '-'}
                                             </td>
                                         </tr>
@@ -323,7 +333,7 @@ const History = () => {
                                 </tbody>
                             </table>
                         </div>
-                    </div>
+                    </>
                 )}
             </div>
         </div>

@@ -5,7 +5,7 @@ import AlertChip from '../components/product/AlertChip';
 import { showSuccess } from '../components/ui/Toast';
 import type { StockAlert } from '../types/movements';
 import { useNavigate } from 'react-router-dom';
-import { FileDown, Package, TrendingDown, AlertTriangle, CheckCircle } from 'lucide-react';
+import { FileDown, Package, TrendingDown, AlertTriangle, CheckCircle, Loader2, ArrowRight } from 'lucide-react';
 
 const StockAlerts = () => {
     const [alerts, setAlerts] = useState<StockAlert[]>([]);
@@ -39,29 +39,32 @@ const StockAlerts = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-20">
-                <div className="w-12 h-12 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center bg-cream/50 z-10">
+                <div className="flex flex-col items-center gap-3">
+                    <Loader2 className="w-10 h-10 text-gold animate-spin" />
+                    <p className="text-cocoa/60 font-medium">Loading alerts...</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <div>
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h2 className="md:text-4xl text-2xl font-serif font-bold text-cocoa flex items-center gap-3">
-                        <AlertTriangle className="w-8 h-8 md:w-10 md:h-10 text-orange-600" />
+                    <h2 className="text-3xl font-bold text-cocoa tracking-tight flex items-center gap-3">
                         Stock Alerts
                     </h2>
-                    <p className="text-cocoa/60 mt-2">
-                        {alerts.length === 0 ? 'All products are adequately stocked' : `${alerts.length} items need attention`}
+                    <p className="text-cocoa/60 font-medium text-sm mt-1">
+                        {alerts.length === 0 ? 'All products are adequately stocked' : `${alerts.length} items require attention`}
                     </p>
                 </div>
 
                 {alerts.length > 0 && (
                     <button
                         onClick={handleExportPDF}
-                        className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 rounded-lg font-medium transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+                        className="px-6 py-3 bg-cocoa text-gold hover:bg-cocoa/90 rounded-xl font-bold transition-all shadow-lg shadow-cocoa/20 flex items-center gap-2 active:scale-95"
                     >
                         <FileDown className="w-5 h-5" />
                         Export Report
@@ -70,39 +73,44 @@ const StockAlerts = () => {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-xl shadow-md border border-red-200 hover:shadow-lg transition-shadow">
-                    <div className="flex justify-between items-start">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="glass-panel p-6 rounded-2xl border-l-[6px] border-l-red-500 relative overflow-hidden group">
+                    {/* Gradient Blob */}
+                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-red-500/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+
+                    <div className="flex justify-between items-start relative z-10">
                         <div>
-                            <p className="text-sm text-red-700 font-semibold uppercase tracking-wide">Out of Stock</p>
-                            <h3 className="text-4xl font-bold text-red-600 mt-2">{outOfStock.length}</h3>
+                            <p className="text-xs font-bold text-red-600 uppercase tracking-widest mb-1">Out of Stock</p>
+                            <h3 className="text-4xl font-extrabold text-cocoa">{outOfStock.length}</h3>
                         </div>
-                        <div className="bg-red-200 p-3 rounded-full">
-                            <Package className="w-6 h-6 text-red-700" />
+                        <div className="bg-red-100 p-3 rounded-xl">
+                            <Package className="w-6 h-6 text-red-600" />
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl shadow-md border border-orange-200 hover:shadow-lg transition-shadow">
-                    <div className="flex justify-between items-start">
+                <div className="glass-panel p-6 rounded-2xl border-l-[6px] border-l-orange-500 relative overflow-hidden group">
+                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-orange-500/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className="flex justify-between items-start relative z-10">
                         <div>
-                            <p className="text-sm text-orange-700 font-semibold uppercase tracking-wide">Critical Low</p>
-                            <h3 className="text-4xl font-bold text-orange-600 mt-2">{critical.length}</h3>
+                            <p className="text-xs font-bold text-orange-600 uppercase tracking-widest mb-1">Critical Low</p>
+                            <h3 className="text-4xl font-extrabold text-cocoa">{critical.length}</h3>
                         </div>
-                        <div className="bg-orange-200 p-3 rounded-full">
-                            <AlertTriangle className="w-6 h-6 text-orange-700" />
+                        <div className="bg-orange-100 p-3 rounded-xl">
+                            <AlertTriangle className="w-6 h-6 text-orange-600" />
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl shadow-md border border-yellow-200 hover:shadow-lg transition-shadow">
-                    <div className="flex justify-between items-start">
+                <div className="glass-panel p-6 rounded-2xl border-l-[6px] border-l-yellow-500 relative overflow-hidden group">
+                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-yellow-500/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className="flex justify-between items-start relative z-10">
                         <div>
-                            <p className="text-sm text-yellow-700 font-semibold uppercase tracking-wide">Low Stock</p>
-                            <h3 className="text-4xl font-bold text-yellow-600 mt-2">{low.length}</h3>
+                            <p className="text-xs font-bold text-yellow-600 uppercase tracking-widest mb-1">Low Stock</p>
+                            <h3 className="text-4xl font-extrabold text-cocoa">{low.length}</h3>
                         </div>
-                        <div className="bg-yellow-200 p-3 rounded-full">
-                            <TrendingDown className="w-6 h-6 text-yellow-700" />
+                        <div className="bg-yellow-100 p-3 rounded-xl">
+                            <TrendingDown className="w-6 h-6 text-yellow-600" />
                         </div>
                     </div>
                 </div>
@@ -110,20 +118,25 @@ const StockAlerts = () => {
 
             {/* Alerts List */}
             {alerts.length === 0 ? (
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-md border border-green-200 p-12 text-center">
-                    <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold text-green-700 mb-2">All Good!</h3>
-                    <p className="text-green-600">All products are adequately stocked. No alerts at this time.</p>
+                <div className="glass-panel p-12 rounded-3xl text-center border border-green-200/50 bg-gradient-to-br from-green-50/50 to-emerald-50/50">
+                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <CheckCircle className="w-10 h-10 text-green-600" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-green-800 mb-2">Inventory Healthy</h3>
+                    <p className="text-green-700/70 font-medium">All products are adequately stocked. No alerts at this time.</p>
                 </div>
             ) : (
-                <div className="space-y-6">
+                <div className="space-y-10">
                     {/* Out of Stock Section */}
                     {outOfStock.length > 0 && (
                         <div>
-                            <h3 className="text-xl font-bold text-red-600 mb-4 flex items-center gap-2">
-                                <Package className="w-5 h-5" />
-                                Out of Stock ({outOfStock.length})
-                            </h3>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-2 bg-red-100 rounded-lg">
+                                    <Package className="w-5 h-5 text-red-600" />
+                                </div>
+                                <h3 className="text-xl font-bold text-cocoa">Out of Stock</h3>
+                                <span className="text-sm font-semibold text-cocoa/40 bg-cocoa/5 px-2 py-1 rounded-md">{outOfStock.length} items</span>
+                            </div>
                             <div className="grid grid-cols-1 gap-4">
                                 {outOfStock.map(alert => (
                                     <AlertCard key={alert.product.id} alert={alert} navigate={navigate} />
@@ -135,10 +148,13 @@ const StockAlerts = () => {
                     {/* Critical Section */}
                     {critical.length > 0 && (
                         <div>
-                            <h3 className="text-xl font-bold text-orange-600 mb-4 flex items-center gap-2">
-                                <AlertTriangle className="w-5 h-5" />
-                                Critical Low Stock ({critical.length})
-                            </h3>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-2 bg-orange-100 rounded-lg">
+                                    <AlertTriangle className="w-5 h-5 text-orange-600" />
+                                </div>
+                                <h3 className="text-xl font-bold text-cocoa">Critical Low Stock</h3>
+                                <span className="text-sm font-semibold text-cocoa/40 bg-cocoa/5 px-2 py-1 rounded-md">{critical.length} items</span>
+                            </div>
                             <div className="grid grid-cols-1 gap-4">
                                 {critical.map(alert => (
                                     <AlertCard key={alert.product.id} alert={alert} navigate={navigate} />
@@ -150,10 +166,13 @@ const StockAlerts = () => {
                     {/* Low Stock Section */}
                     {low.length > 0 && (
                         <div>
-                            <h3 className="text-xl font-bold text-yellow-600 mb-4 flex items-center gap-2">
-                                <TrendingDown className="w-5 h-5" />
-                                Low Stock ({low.length})
-                            </h3>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-2 bg-yellow-100 rounded-lg">
+                                    <TrendingDown className="w-5 h-5 text-yellow-600" />
+                                </div>
+                                <h3 className="text-xl font-bold text-cocoa">Low Stock</h3>
+                                <span className="text-sm font-semibold text-cocoa/40 bg-cocoa/5 px-2 py-1 rounded-md">{low.length} items</span>
+                            </div>
                             <div className="grid grid-cols-1 gap-4">
                                 {low.map(alert => (
                                     <AlertCard key={alert.product.id} alert={alert} navigate={navigate} />
@@ -169,57 +188,66 @@ const StockAlerts = () => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const AlertCard = ({ alert, navigate }: { alert: StockAlert; navigate: any }) => {
-    const severityColors = {
-        OUT_OF_STOCK: 'border-red-400 bg-gradient-to-r from-red-50 to-red-100 hover:from-red-100 hover:to-red-150',
-        CRITICAL: 'border-orange-400 bg-gradient-to-r from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-150',
-        LOW: 'border-yellow-400 bg-gradient-to-r from-yellow-50 to-yellow-100 hover:from-yellow-100 hover:to-yellow-150'
+    const severityStyles = {
+        OUT_OF_STOCK: 'border-l-red-500 hover:shadow-red-500/10',
+        CRITICAL: 'border-l-orange-500 hover:shadow-orange-500/10',
+        LOW: 'border-l-yellow-500 hover:shadow-yellow-500/10'
     };
+
+    const bgStyles = {
+        OUT_OF_STOCK: 'bg-red-50/40',
+        CRITICAL: 'bg-orange-50/40',
+        LOW: 'bg-yellow-50/40'
+    }
 
     const percentage = alert.product.stockAlertThreshold > 0
         ? Math.round((alert.product.quantity / alert.product.stockAlertThreshold) * 100)
         : 0;
 
     return (
-        <div className={`bg-white rounded-xl p-6 shadow-md border-l-4 ${severityColors[alert.severity]} transition-all cursor-pointer`}>
-            <div className="flex justify-between items-start gap-4">
-                <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                        <h4 className="text-lg font-bold text-cocoa">{alert.product.name}</h4>
+        <div className={`glass-panel p-6 rounded-2xl border-l-[6px] ${severityStyles[alert.severity]} ${bgStyles[alert.severity]} transition-all hover:translate-x-1 duration-300 group`}>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div className="flex-1 w-full">
+                    <div className="flex items-center justify-between md:justify-start gap-4 mb-2">
+                        <h4 className="text-xl font-bold text-cocoa">{alert.product.name}</h4>
                         <AlertChip severity={alert.severity} size="sm" />
                     </div>
 
-                    <p className="text-cocoa/70 mb-4">{alert.message}</p>
+                    <p className="text-cocoa/70 mb-4 text-sm font-medium">{alert.message}</p>
 
-                    <div className="flex items-center gap-6 text-sm flex-wrap">
+                    <div className="flex items-center gap-4 md:gap-8 flex-wrap">
                         <div className="flex items-center gap-2">
-                            <span className="text-cocoa/60 font-medium">Current:</span>
-                            <span className={`font-bold px-2 py-1 rounded ${alert.severity === 'OUT_OF_STOCK' ? 'bg-red-100 text-red-700' :
-                                    alert.severity === 'CRITICAL' ? 'bg-orange-100 text-orange-700' :
-                                        'bg-yellow-100 text-yellow-700'
+                            <span className="text-xs uppercase tracking-wider font-bold text-cocoa/40">Current</span>
+                            <span className={`text-sm font-bold px-2 py-1 rounded-md ${alert.severity === 'OUT_OF_STOCK' ? 'bg-red-100 text-red-700' :
+                                alert.severity === 'CRITICAL' ? 'bg-orange-100 text-orange-700' :
+                                    'bg-yellow-100 text-yellow-700'
                                 }`}>
                                 {alert.product.quantity} units
                             </span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="text-cocoa/60 font-medium">Threshold:</span>
-                            <span className="font-medium text-cocoa">{alert.product.stockAlertThreshold} units</span>
+                            <span className="text-xs uppercase tracking-wider font-bold text-cocoa/40">Min</span>
+                            <span className="text-sm font-bold text-cocoa">{alert.product.stockAlertThreshold} units</span>
                         </div>
                         {alert.severity !== 'OUT_OF_STOCK' && (
                             <div className="flex items-center gap-2">
-                                <span className="text-cocoa/60 font-medium">Level:</span>
-                                <span className="font-medium text-cocoa">{percentage}%</span>
+                                <span className="text-xs uppercase tracking-wider font-bold text-cocoa/40">Level</span>
+                                <span className="text-sm font-bold text-cocoa">{percentage}%</span>
                             </div>
                         )}
                     </div>
                 </div>
 
-                <button
-                    onClick={() => navigate('/stock-in')}
-                    className="px-5 py-2.5 bg-gradient-to-r from-forest to-green-700 text-white hover:from-green-700 hover:to-green-800 rounded-lg font-medium transition-all shadow-md hover:shadow-lg text-sm whitespace-nowrap flex items-center gap-2"
-                >
-                    <Package className="w-4 h-4" />
-                    Restock
-                </button>
+                <div className="w-full md:w-auto">
+                    <button
+                        onClick={() => navigate('/stock-in')}
+                        className="w-full md:w-auto px-6 py-3 bg-white text-cocoa border border-cocoa/10 hover:bg-cocoa/5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 active:scale-95 group-hover:border-cocoa/20"
+                    >
+                        <Package className="w-4 h-4" />
+                        <span>Restock</span>
+                        <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                </div>
             </div>
         </div>
     );

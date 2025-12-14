@@ -14,6 +14,7 @@ import {
     CheckCircle,
     TrendingUp,
     Loader2,
+    Info
 } from 'lucide-react';
 
 const StockIn = () => {
@@ -106,55 +107,65 @@ const StockIn = () => {
     const selectedProduct = products.find(p => p.id === formData.productId);
 
     return (
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20">
 
             {/* HEADER */}
-            <div className="mb-8">
-                <h2 className="md:text-4xl text-2xl font-serif font-bold text-cocoa flex items-center gap-3">
-                    <ArrowDownCircle className="w-8 h-8 md:w-10 md:h-10 text-green-600" />
-                    Stock IN (Entrée)
-                </h2>
-                <p className="text-cocoa/60 mt-2">
-                    Record new material and equipment arrivals
-                </p>
+            <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-500/10 rounded-2xl">
+                    <ArrowDownCircle className="w-8 h-8 text-green-600" />
+                </div>
+                <div>
+                    <h2 className="text-3xl font-bold text-cocoa tracking-tight">
+                        Stock In
+                    </h2>
+                    <p className="text-cocoa/60 font-medium text-sm">
+                        Record material arrivals (Entrée)
+                    </p>
+                </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg border border-cocoa/5 p-6 md:p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="glass-panel p-6 md:p-8 rounded-3xl relative overflow-hidden">
+                {/* Decorative background element */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+
+                <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
 
                     {/* Product Selection */}
-                    <div>
-                        <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
                             <Package className="w-4 h-4 text-green-600" />
-                            Product / Material <span className="text-red-600">*</span>
+                            Product <span className="text-red-500">*</span>
                         </label>
 
-                        <select
-                            required
-                            disabled={loading}
-                            value={formData.productId}
-                            onChange={(e) => setFormData({ ...formData, productId: parseInt(e.target.value) })}
-                            className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa focus:ring-2 focus:ring-green-500/50 outline-none text-base transition-all"
-                        >
-                            <option value={0}>Select a product...</option>
-                            {products.length === 0 && (
-                                <option disabled>No products found</option>
-                            )}
-                            {products.map(product => (
-                                <option key={product.id} value={product.id}>
-                                    {product.name} (Stock: {product.quantity})
-                                </option>
-                            ))}
-                        </select>
+                        <div className="relative">
+                            <select
+                                required
+                                disabled={loading}
+                                value={formData.productId}
+                                onChange={(e) => setFormData({ ...formData, productId: parseInt(e.target.value) })}
+                                className="w-full pl-4 pr-10 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-green-500/50 outline-none text-base transition-all appearance-none shadow-sm font-medium"
+                            >
+                                <option value={0}>Select a product to add stock...</option>
+                                {products.length === 0 && (
+                                    <option disabled>No products found</option>
+                                )}
+                                {products.map(product => (
+                                    <option key={product.id} value={product.id}>
+                                        {product.name} (Current Stock: {product.quantity})
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none border-t-[5px] border-t-cocoa/30 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent"></div>
+                        </div>
                     </div>
 
                     {/* Quantity + Date */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Quantity */}
-                        <div>
-                            <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
                                 <TrendingUp className="w-4 h-4 text-green-600" />
-                                Quantity <span className="text-red-600">*</span>
+                                Quantity <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="number"
@@ -162,40 +173,40 @@ const StockIn = () => {
                                 min="1"
                                 value={formData.quantity || ''}
                                 onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
-                                className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa text-base transition-all"
-                                placeholder="Enter quantity"
+                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm"
+                                placeholder="0"
                             />
 
                             {selectedProduct && formData.quantity > 0 && (
-                                <div className="mt-2 flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
-                                    <TrendingUp className="w-4 h-4" />
-                                    <span className="font-medium">
-                                        New total: {selectedProduct.quantity + formData.quantity} units
+                                <div className="mt-2 flex items-center gap-2 text-xs font-medium text-green-700 bg-green-500/10 px-3 py-2 rounded-lg border border-green-500/20">
+                                    <TrendingUp className="w-3 h-3" />
+                                    <span>
+                                        New Total: <span className="font-bold">{selectedProduct.quantity + formData.quantity}</span> units
                                     </span>
                                 </div>
                             )}
                         </div>
 
                         {/* Date */}
-                        <div>
-                            <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
                                 <Calendar className="w-4 h-4 text-green-600" />
-                                Date <span className="text-red-600">*</span>
+                                Entry Date <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="date"
                                 required
                                 value={formData.date}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa text-base transition-all"
+                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm"
                             />
                         </div>
                     </div>
 
                     {/* Reference + Supplier */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
                                 <FileText className="w-4 h-4 text-green-600" />
                                 Reference / Invoice #
                             </label>
@@ -203,44 +214,44 @@ const StockIn = () => {
                                 type="text"
                                 value={formData.reference}
                                 onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                                className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa text-base"
-                                placeholder="e.g., INV-2024-001"
+                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
+                                placeholder="e.g. INV-2024-001"
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
                                 <Building className="w-4 h-4 text-green-600" />
-                                Supplier
+                                Supplier Name
                             </label>
                             <input
                                 type="text"
                                 value={formData.supplier}
                                 onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
-                                className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa text-base"
-                                placeholder="Supplier name"
+                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
+                                placeholder="e.g. Cocoa Direct Ltd."
                             />
                         </div>
                     </div>
 
                     {/* Reason */}
-                    <div>
-                        <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
                             <User className="w-4 h-4 text-green-600" />
-                            Reason for Entry
+                            Reason
                         </label>
                         <input
                             type="text"
                             value={formData.reason}
                             onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                            className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa"
-                            placeholder="e.g., New stock order, Return, Transfer"
+                            className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
+                            placeholder="e.g. Weekly Restock"
                         />
                     </div>
 
                     {/* Notes */}
-                    <div>
-                        <label className="block text-sm font-semibold text-cocoa mb-2 flex items-center gap-2">
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-cocoa flex items-center gap-2">
                             <StickyNote className="w-4 h-4 text-green-600" />
                             Additional Notes
                         </label>
@@ -248,30 +259,30 @@ const StockIn = () => {
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             rows={3}
-                            className="w-full px-4 py-3 bg-cream border border-cocoa/10 rounded-lg text-cocoa resize-none"
-                            placeholder="Any additional information..."
+                            className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa resize-none transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
+                            placeholder="Any checks or comments..."
                         />
                     </div>
 
                     {/* Buttons */}
-                    <div className="flex flex-col md:flex-row gap-4 pt-4">
+                    <div className="flex flex-col md:flex-row gap-4 pt-4 border-t border-cocoa/5">
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="w-full md:flex-1 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:shadow-xl"
+                            className="w-full md:flex-1 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-green-600/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
                         >
                             {submitting ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 <CheckCircle className="w-5 h-5" />
                             )}
-                            {submitting ? 'Recording...' : 'Record Stock Entry'}
+                            {submitting ? 'Recording...' : 'Confirm Entry'}
                         </button>
 
                         <button
                             type="button"
                             onClick={() => window.history.back()}
-                            className="w-full md:w-auto px-8 py-4 bg-white border-2 border-cocoa/20 text-cocoa rounded-xl font-medium text-lg hover:bg-cocoa/5 transition-all"
+                            className="w-full md:w-auto px-8 py-4 bg-white text-cocoa border border-cocoa/10 rounded-xl font-bold text-lg hover:bg-cocoa/5 transition-all active:scale-95"
                         >
                             Cancel
                         </button>
@@ -280,20 +291,17 @@ const StockIn = () => {
             </div>
 
             {/* Info Box */}
-            <div className="mt-6 bg-gradient-to-r from-blue-50 to-cyan-50 border-l-4 border-blue-500 rounded-xl p-6 shadow-md">
-                <div className="flex gap-3">
-                    <div className="bg-blue-100 p-2 rounded-lg h-fit">
-                        <Package className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-blue-900 mb-2">Stock Entry Information</h4>
-                        <ul className="text-sm text-blue-800 space-y-1">
-                            <li>• This form records new materials or equipment entering the warehouse</li>
-                            <li>• The product quantity will be automatically updated</li>
-                            <li>• All entries are logged and can be viewed in the History page</li>
-                            <li>• Reference and supplier info help with tracking and auditing</li>
-                        </ul>
-                    </div>
+            <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 flex flex-col md:flex-row gap-4">
+                <div className="bg-blue-100 p-3 rounded-xl h-fit w-fit">
+                    <Info className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                    <h4 className="font-bold text-blue-900 mb-2">About Stock Entries</h4>
+                    <ul className="text-sm text-blue-800/80 space-y-1 list-disc list-inside">
+                        <li>This action adds quantities to your existing inventory.</li>
+                        <li>Stock entries are permanent and logged in the history.</li>
+                        <li>Ensure the reference matches your physical invoice for easier auditing.</li>
+                    </ul>
                 </div>
             </div>
         </div>

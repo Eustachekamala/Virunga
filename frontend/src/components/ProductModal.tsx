@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Category, TypeProduct } from '../types';
 import type { CreateProductDTO, Product } from '../types';
-import { Camera, Upload, X } from 'lucide-react';
+import { Camera, Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import { API_BASE_URL } from '../api/client';
 
 interface ProductModalProps {
@@ -65,7 +65,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                     );
                 }
             } else {
-                // Reset new form
                 setFormData({
                     name: '',
                     quantity: 0,
@@ -82,7 +81,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
         } else {
             stopCamera();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, productToEdit]);
 
     // ----------------------
@@ -106,7 +105,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
             setStream(mediaStream);
             if (videoRef.current) videoRef.current.srcObject = mediaStream;
             setShowCamera(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             let message = 'Could not access camera.';
 
@@ -181,10 +180,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                 name === "quantity"
                     ? Number(value)
                     : name === "category"
-                    ? (value as Category)
-                    : name === "typeProduct"
-                    ? (value as TypeProduct)
-                    : value,
+                        ? (value as Category)
+                        : name === "typeProduct"
+                            ? (value as TypeProduct)
+                            : value,
         }));
     };
 
@@ -208,38 +207,50 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-cocoa/60 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl border border-gold/20">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div
+                className="absolute inset-0 bg-cocoa/60 backdrop-blur-sm animate-in fade-in duration-300"
+                onClick={onClose}
+            />
 
+            <div className="bg-cream rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative z-10 animate-in zoom-in-95 duration-300 border border-white/20">
                 {/* HEADER */}
-                <div className="flex justify-between items-center mb-6 border-b border-cocoa/10 pb-4">
-                    <h2 className="text-2xl font-serif font-bold text-cocoa">
-                        {productToEdit ? 'Edit Product' : 'New Product'}
-                    </h2>
-                    <button onClick={onClose} className="text-cocoa/40 hover:text-cocoa">
-                        <X className="w-6 h-6" />
+                <div className="flex justify-between items-center p-6 border-b border-cocoa/5 bg-white/50 backdrop-blur sticky top-0 z-20">
+                    <div>
+                        <h2 className="text-2xl font-bold text-cocoa tracking-tight">
+                            {productToEdit ? 'Edit Product' : 'New Product'}
+                        </h2>
+                        <p className="text-sm text-cocoa/60">Fill in the details below.</p>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 text-cocoa/40 hover:text-cocoa hover:bg-black/5 rounded-full transition-colors"
+                    >
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
 
                 {/* FORM */}
-                <form onSubmit={handleSubmit} className="space-y-5">
+                <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
 
                     {/* Name */}
-                    <div>
-                        <label className="text-sm font-semibold text-cocoa/80 mb-1 block">Name</label>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-cocoa/80">Product Name</label>
                         <input
                             name="name"
                             required
+                            placeholder="e.g. Industrial Mixer"
                             value={formData.name}
                             onChange={handleChange}
-                            className="w-full bg-cream border border-cocoa/10 rounded-lg px-4 py-3 text-cocoa"
+                            className="w-full bg-white border border-cocoa/10 rounded-xl px-4 py-3 text-cocoa focus:ring-2 focus:ring-gold/50 outline-none transition-all placeholder:text-cocoa/30"
                         />
                     </div>
 
                     {/* Quantity + Type */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-sm font-semibold text-cocoa/80 mb-1 block">Quantity</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-semibold text-cocoa/80">Quantity</label>
                             <input
                                 name="quantity"
                                 type="number"
@@ -247,61 +258,66 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                                 required
                                 value={formData.quantity}
                                 onChange={handleChange}
-                                className="w-full bg-cream border border-cocoa/10 rounded-lg px-4 py-3"
+                                className="w-full bg-white border border-cocoa/10 rounded-xl px-4 py-3 text-cocoa focus:ring-2 focus:ring-gold/50 outline-none transition-all placeholder:text-cocoa/30"
                             />
                         </div>
 
-                        <div>
-                            <label className="text-sm font-semibold text-cocoa/80 mb-1 block">Type</label>
-                            <select
-                                name="typeProduct"
-                                value={formData.typeProduct}
-                                onChange={handleChange}
-                                className="w-full bg-cream border border-cocoa/10 rounded-lg px-4 py-3"
-                            >
-                                {Object.values(TypeProduct).map(t => (
-                                    <option key={t} value={t}>{t}</option>
-                                ))}
-                            </select>
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-semibold text-cocoa/80">Type</label>
+                            <div className="relative">
+                                <select
+                                    name="typeProduct"
+                                    value={formData.typeProduct}
+                                    onChange={handleChange}
+                                    className="w-full bg-white border border-cocoa/10 rounded-xl px-4 py-3 text-cocoa focus:ring-2 focus:ring-gold/50 outline-none appearance-none transition-all"
+                                >
+                                    {Object.values(TypeProduct).map(t => (
+                                        <option key={t} value={t}>{t}</option>
+                                    ))}
+                                </select>
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none border-t-[5px] border-t-cocoa/30 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent"></div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Category */}
-                    <div>
-                        <label className="text-sm font-semibold text-cocoa/80 mb-1 block">Category</label>
-                        <select
-                            name="category"
-                            value={formData.category}
-                            onChange={handleChange}
-                            className="w-full bg-cream border border-cocoa/10 rounded-lg px-4 py-3"
-                        >
-                            {Object.values(Category).map(c => (
-                                <option key={c} value={c}>{c}</option>
-                            ))}
-                        </select>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-cocoa/80">Category</label>
+                        <div className="relative">
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                className="w-full bg-white border border-cocoa/10 rounded-xl px-4 py-3 text-cocoa focus:ring-2 focus:ring-gold/50 outline-none appearance-none transition-all"
+                            >
+                                {Object.values(Category).map(c => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none border-t-[5px] border-t-cocoa/30 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent"></div>
+                        </div>
                     </div>
 
                     {/* Description */}
-                    <div>
-                        <label className="text-sm font-semibold text-cocoa/80 mb-1 block">Description</label>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-cocoa/80">Description</label>
                         <textarea
                             name="description"
                             rows={3}
+                            placeholder="Brief description of the product..."
                             value={formData.description}
                             onChange={handleChange}
-                            className="w-full bg-cream border border-cocoa/10 rounded-lg px-4 py-3"
+                            className="w-full bg-white border border-cocoa/10 rounded-xl px-4 py-3 text-cocoa focus:ring-2 focus:ring-gold/50 outline-none transition-all placeholder:text-cocoa/30 resize-none"
                         />
                     </div>
 
                     {/* Image Section */}
-                    <div>
-                        <label className="block text-sm font-semibold text-cocoa/80 mb-2">Product Image</label>
+                    <div className="space-y-3">
+                        <label className="text-sm font-semibold text-cocoa/80">Product Image</label>
 
                         {/* Upload and Camera Buttons */}
                         {!imagePreview && !showCamera && (
-                            <div className="grid grid-cols-2 gap-3">
-
-                                {/* Upload */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <input
                                         id="file-upload"
@@ -312,14 +328,15 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                                     />
                                     <label
                                         htmlFor="file-upload"
-                                        className="cursor-pointer bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-dashed border-blue-300 rounded-lg p-6 flex flex-col items-center"
+                                        className="cursor-pointer group relative overflow-hidden bg-white border border-dashed border-cocoa/20 rounded-xl p-8 flex flex-col items-center justify-center hover:border-gold hover:bg-gold/5 transition-all"
                                     >
-                                        <Upload className="w-8 h-8 text-blue-600 mb-2" />
-                                        <span className="text-blue-700 text-sm">Upload Image</span>
+                                        <div className="p-3 bg-cocoa/5 rounded-full mb-3 group-hover:bg-gold/10 transition-colors">
+                                            <Upload className="w-6 h-6 text-cocoa/60 group-hover:text-gold" />
+                                        </div>
+                                        <span className="text-cocoa/70 font-medium text-sm group-hover:text-cocoa">Upload Image</span>
                                     </label>
                                 </div>
 
-                                {/* Camera */}
                                 <div>
                                     <input
                                         ref={mobileFileInputRef}
@@ -340,10 +357,12 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                                                 startCamera();
                                             }
                                         }}
-                                        className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-dashed border-green-300 rounded-lg p-6 flex flex-col items-center"
+                                        className="w-full h-full cursor-pointer group relative overflow-hidden bg-white border border-dashed border-cocoa/20 rounded-xl p-8 flex flex-col items-center justify-center hover:border-gold hover:bg-gold/5 transition-all"
                                     >
-                                        <Camera className="w-8 h-8 text-green-600 mb-2" />
-                                        <span className="text-green-700 text-sm">Take Photo</span>
+                                        <div className="p-3 bg-cocoa/5 rounded-full mb-3 group-hover:bg-gold/10 transition-colors">
+                                            <Camera className="w-6 h-6 text-cocoa/60 group-hover:text-gold" />
+                                        </div>
+                                        <span className="text-cocoa/70 font-medium text-sm group-hover:text-cocoa">Take Photo</span>
                                     </button>
                                 </div>
                             </div>
@@ -351,31 +370,32 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
 
                         {/* Camera Error */}
                         {cameraError && (
-                            <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg border border-red-200 text-sm mb-3">
+                            <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl border border-red-200 text-sm flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-red-500"></div>
                                 {cameraError}
                             </div>
                         )}
 
                         {/* Camera View */}
                         {showCamera && (
-                            <div className="space-y-3">
-                                <video ref={videoRef} autoPlay playsInline className="w-full h-64 object-cover rounded-lg" />
+                            <div className="space-y-4 bg-black rounded-2xl overflow-hidden shadow-lg">
+                                <video ref={videoRef} autoPlay playsInline className="w-full h-64 object-cover" />
 
-                                <div className="flex gap-3">
+                                <div className="flex gap-4 p-4 bg-black/90 backdrop-blur justify-center">
                                     <button
                                         type="button"
-                                        onClick={capturePhoto}
-                                        className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg"
+                                        onClick={() => { setShowCamera(false); stopCamera(); }}
+                                        className="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors text-sm font-medium"
                                     >
-                                        Capture
+                                        Cancel
                                     </button>
 
                                     <button
                                         type="button"
-                                        onClick={() => { setShowCamera(false); stopCamera(); }}
-                                        className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg"
+                                        onClick={capturePhoto}
+                                        className="px-6 py-2.5 bg-white text-black rounded-full transition-transform active:scale-95 font-medium flex items-center gap-2"
                                     >
-                                        Cancel
+                                        <Camera className="w-4 h-4" /> Capture fa
                                     </button>
                                 </div>
                             </div>
@@ -383,20 +403,23 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
 
                         {/* Image Preview */}
                         {imagePreview && !showCamera && (
-                            <div className="relative mt-3">
+                            <div className="relative mt-3 group w-full sm:w-1/2">
                                 <img
                                     src={imagePreview}
                                     alt="Preview"
-                                    className="w-full h-48 object-cover rounded-lg border"
+                                    className="w-full h-48 object-cover rounded-2xl border border-cocoa/10 shadow-sm"
                                 />
 
                                 <button
                                     type="button"
                                     onClick={removeImage}
-                                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full"
+                                    className="absolute top-2 right-2 bg-black/50 hover:bg-red-500 text-white p-2 rounded-full backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
+                                <div className="absolute bottom-2 left-2 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-xs font-medium flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                    <ImageIcon className="w-3 h-3" /> Image Selected
+                                </div>
                             </div>
                         )}
 
@@ -404,11 +427,11 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                     </div>
 
                     {/* Footer Buttons */}
-                    <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-cocoa/10">
+                    <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-cocoa/5">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-6 py-3 text-cocoa/60 hover:text-cocoa"
+                            className="px-6 py-3 text-cocoa/60 hover:text-cocoa font-medium transition-colors"
                         >
                             Cancel
                         </button>
@@ -416,13 +439,13 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSubmit, 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="px-8 py-3 bg-cocoa text-gold rounded-lg font-bold disabled:opacity-50"
+                            className="px-8 py-3 bg-cocoa text-gold hover:bg-cocoa-light rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-cocoa/20 flex items-center gap-2"
                         >
+                            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                             {loading ? 'Saving...' : productToEdit ? 'Save Changes' : 'Create Product'}
                         </button>
                     </div>
                 </form>
-
             </div>
         </div>
     );
