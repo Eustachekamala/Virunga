@@ -3,7 +3,7 @@ import { getWeeklySummary } from '../services/stockMovements';
 import { generateWeeklyStockReport } from '../services/pdfGenerator';
 import { showSuccess } from '../components/ui/Toast';
 import { format } from 'date-fns';
-import { CalendarDays, FileDown, ArrowDownCircle, ArrowUpCircle, TrendingUp, Loader2, BarChart2, CheckCircle2 } from 'lucide-react';
+import { CalendarDays, FileDown, ArrowDownCircle, ArrowUpCircle,Loader2, BarChart2, CheckCircle2 } from 'lucide-react';
 import type { WeeklySummary } from '../types/movements';
 import {
     BarChart,
