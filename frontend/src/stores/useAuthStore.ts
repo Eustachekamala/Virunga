@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { env } from 'process';
 
 export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'USER';
 
@@ -26,8 +25,8 @@ export const useAuthStore = create<AuthState>()(
             login: (email: string) => {
                 const normalizedEmail = email.toLowerCase().trim();
 
-                const superAdminEmail = env.VITE_SUPER_ADMIN_EMAIL?.toLowerCase().trim();
-                const adminEmail = env.VITE_ADMIN_EMAIL?.toLowerCase().trim();
+                const superAdminEmail = import.meta.env.VITE_SUPER_ADMIN_EMAIL?.toLowerCase().trim();
+                const adminEmail = import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase().trim();
 
                 if (normalizedEmail === superAdminEmail) {
                     set({
