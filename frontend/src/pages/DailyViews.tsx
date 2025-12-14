@@ -8,7 +8,13 @@ import type { DailySummary, StockMovement } from '../types/movements';
 
 const DailyViews = () => {
     const [activeTab, setActiveTab] = useState<'entries' | 'exits'>('entries');
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(() => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    });
     const [summary, setSummary] = useState<DailySummary | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -42,8 +48,8 @@ const DailyViews = () => {
         <div>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h2 className="text-4xl font-serif font-bold text-cocoa flex items-center gap-3">
-                        <Calendar className="w-10 h-10 text-blue-600" />
+                    <h2 className="md:text-4xl text-2xl font-serif font-bold text-cocoa flex items-center gap-3">
+                        <Calendar className="w-8 h-8 md:w-12 md:h-12 text-blue-600" />
                         Daily Summary
                     </h2>
                     <p className="text-cocoa/60 mt-2">View entries and exits for any date</p>

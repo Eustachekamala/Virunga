@@ -100,7 +100,7 @@ const History = () => {
                     <button
                         onClick={handleExport}
                         disabled={movements.length === 0}
-                        className={ `flex items-center gap-2 px-5 py-2 bg-cocoa text-gold hover:bg-cocoa/90 rounded-lg font-medium transition-all disabled:opacity-50 ${movements.length === 0 ? 'opacity-50' : ''}`}
+                        className={`flex items-center gap-2 px-5 py-2 bg-cocoa text-gold hover:bg-cocoa/90 rounded-lg font-medium transition-all disabled:opacity-50 ${movements.length === 0 ? 'opacity-50' : ''}`}
                     >
                         <FileDown className="w-5 h-5" /> Export PDF
                     </button>
@@ -225,61 +225,104 @@ const History = () => {
                         )}
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-cocoa text-cream">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-sm font-medium">Date & Time</th>
-                                    <th className="px-6 py-4 text-left text-sm font-medium">Type</th>
-                                    <th className="px-6 py-4 text-left text-sm font-medium">Product</th>
-                                    <th className="px-6 py-4 text-left text-sm font-medium">Quantity</th>
-                                    <th className="px-6 py-4 text-left text-sm font-medium">User/Supplier</th>
-                                    <th className="px-6 py-4 text-left text-sm font-medium">Details</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-cocoa/10">
-                                {movements.map((movement) => (
-                                    <tr key={movement.id} className="hover:bg-cocoa/5 transition-colors">
-                                        <td className="px-6 py-4 text-sm text-cocoa">
-                                            <div>
-                                                <div className="font-medium">{format(new Date(movement.date), 'MMM dd, yyyy')}</div>
-                                                <div className="text-cocoa/60">{format(new Date(movement.date), 'HH:mm')}</div>
+                    <div className="overflow-hidden">
+                        {/* Mobile Card View */}
+                        <div className="md:hidden space-y-4 p-4">
+                            {movements.map((movement) => (
+                                <div key={movement.id} className="bg-cream/50 border border-cocoa/10 rounded-lg p-4 shadow-sm">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div>
+                                            <div className="text-cocoa font-bold text-lg">{movement.productName}</div>
+                                            <div className="text-cocoa/50 text-xs">
+                                                {format(new Date(movement.date), 'MMM dd, yyyy HH:mm')}
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`flex items-center gap-2 justify-center px-3 py-1 w-20 rounded-full text-xs font-medium ${movement.type === 'ENTREE'
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-orange-100 text-orange-700'
-                                                }`}>
-                                                {movement.type === 'ENTREE' ? (
-                                                    <>
-                                                        <ArrowUpCircleIcon className="w-4 h-4" />
-                                                        <span>IN</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <ArrowDownCircleIcon className="w-4 h-4" />
-                                                        <span>OUT</span>
-                                                    </>
-                                                )}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm font-medium text-cocoa">
-                                            {movement.productName}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm font-bold text-cocoa">
-                                            {movement.quantity}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-cocoa/70">
-                                            {movement.supplier || movement.receiver || movement.user || '-'}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-cocoa/70">
-                                            {movement.reason || movement.purpose || movement.reference || '-'}
-                                        </td>
+                                        </div>
+                                        <span className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${movement.type === 'ENTREE'
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-orange-100 text-orange-700'
+                                            }`}>
+                                            {movement.type === 'ENTREE' ? <ArrowUpCircleIcon className="w-3 h-3" /> : <ArrowDownCircleIcon className="w-3 h-3" />}
+                                            {movement.type === 'ENTREE' ? 'IN' : 'OUT'}
+                                        </span>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2 text-sm text-cocoa/70 mb-3">
+                                        <div>
+                                            <span className="block text-xs text-cocoa/40 uppercase">Qty</span>
+                                            <span className="font-bold text-cocoa">{movement.quantity}</span>
+                                        </div>
+                                        <div>
+                                            <span className="block text-xs text-cocoa/40 uppercase">User/Prov</span>
+                                            <span className="truncate block">{movement.supplier || movement.receiver || movement.user || '-'}</span>
+                                        </div>
+                                    </div>
+
+                                    {(movement.reason || movement.purpose || movement.reference) && (
+                                        <div className="pt-3 border-t border-cocoa/5 text-xs text-cocoa/60">
+                                            {movement.reason || movement.purpose || movement.reference}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-cocoa text-cream">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-sm font-medium">Date & Time</th>
+                                        <th className="px-6 py-4 text-left text-sm font-medium">Type</th>
+                                        <th className="px-6 py-4 text-left text-sm font-medium">Product</th>
+                                        <th className="px-6 py-4 text-left text-sm font-medium">Quantity</th>
+                                        <th className="px-6 py-4 text-left text-sm font-medium">User/Supplier</th>
+                                        <th className="px-6 py-4 text-left text-sm font-medium">Details</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-cocoa/10">
+                                    {movements.map((movement) => (
+                                        <tr key={movement.id} className="hover:bg-cocoa/5 transition-colors">
+                                            <td className="px-6 py-4 text-sm text-cocoa">
+                                                <div>
+                                                    <div className="font-medium">{format(new Date(movement.date), 'MMM dd, yyyy')}</div>
+                                                    <div className="text-cocoa/60">{format(new Date(movement.date), 'HH:mm')}</div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`flex items-center gap-2 justify-center px-3 py-1 w-20 rounded-full text-xs font-medium ${movement.type === 'ENTREE'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : 'bg-orange-100 text-orange-700'
+                                                    }`}>
+                                                    {movement.type === 'ENTREE' ? (
+                                                        <>
+                                                            <ArrowUpCircleIcon className="w-4 h-4" />
+                                                            <span>IN</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <ArrowDownCircleIcon className="w-4 h-4" />
+                                                            <span>OUT</span>
+                                                        </>
+                                                    )}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm font-medium text-cocoa">
+                                                {movement.productName}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm font-bold text-cocoa">
+                                                {movement.quantity}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-cocoa/70">
+                                                {movement.supplier || movement.receiver || movement.user || '-'}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-cocoa/70">
+                                                {movement.reason || movement.purpose || movement.reference || '-'}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </div>

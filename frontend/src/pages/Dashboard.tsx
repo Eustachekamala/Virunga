@@ -55,7 +55,7 @@ const Dashboard = () => {
     return (
         <div className="space-y-8">
             <div className="flex justify-between items-center">
-                <h2 className="text-4xl font-serif font-bold text-cocoa">Dashboard</h2>
+                <h2 className="md:text-4xl text-2xl font-serif font-bold text-cocoa">Dashboard</h2>
                 <div className="bg-white px-4 py-2 rounded-lg text-sm text-cocoa/60 border border-cocoa/10">
                     Last updated: {new Date().toLocaleTimeString()}
                 </div>

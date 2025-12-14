@@ -57,8 +57,8 @@ const WeeklyViews = () => {
         <div>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h2 className="text-4xl font-serif font-bold text-cocoa flex items-center gap-3">
-                        <CalendarDays className="w-10 h-10 text-purple-600" />
+                    <h2 className="md:text-4xl text-2xl font-serif font-bold text-cocoa flex items-center gap-3">
+                        <CalendarDays className="w-8 h-8 md:w-10 md:h-10 text-purple-600" />
                         Weekly Summary
                     </h2>
                     <p className="text-cocoa/60 mt-2">

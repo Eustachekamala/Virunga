@@ -1,7 +1,8 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
-import { StockMovement, DailySummary, WeeklySummary, StockAlert } from '../types/movements';
+import { StockMovement, DailySummary, WeeklySummary, StockAlert, MovementType } from '../types/movements';
+import { getMovements } from './stockMovements';
 import { Product } from '../types';
 
 // Company header for all PDFs
@@ -238,6 +239,9 @@ export const generateInventoryReport = (products: Product[]): void => {
     const doc = new jsPDF();
     addCompanyHeader(doc, 'Complete Inventory Report');
 
+    // Fetch movements directly from storage to calculate totals
+    const movements = getMovements();
+
     const totalProducts = products.length;
     const totalQuantity = products.reduce((sum, p) => sum + p.quantity, 0);
     const lowStockCount = products.filter(p => p.quantity <= (p.stockAlertThreshold || 10)).length;
@@ -250,24 +254,41 @@ export const generateInventoryReport = (products: Product[]): void => {
     doc.text(`Total Units: ${totalQuantity}`, 20, 79);
     doc.text(`Low Stock Items: ${lowStockCount}`, 20, 86);
 
+    // Add legend for columns
+    doc.setFontSize(8);
+    doc.text('* Stock In/Out = Total quantity moved in history', 120, 86);
+
     if (products.length > 0) {
         autoTable(doc, {
             startY: 95,
-            head: [['Product Name', 'Type', 'Quantity', 'Threshold', 'Status']],
-            body: products.map(p => [
-                p.name,
-                p.typeProduct,
-                p.quantity.toString(),
-                (p.stockAlertThreshold || 10).toString(),
-                p.quantity === 0 ? 'OUT' :
-                    (p.quantity <= (p.stockAlertThreshold || 10) ? 'LOW' : 'ADEQUATE')
-            ]),
+            head: [['Product Name', 'Category', 'Type', 'Stock In', 'Stock Out', 'Current', 'Threshold', 'Status']],
+            body: products.map(p => {
+                const productMovements = movements.filter(m => m.productId === p.id);
+                const totalIn = productMovements
+                    .filter(m => m.type === MovementType.ENTREE)
+                    .reduce((sum, m) => sum + m.quantity, 0);
+                const totalOut = productMovements
+                    .filter(m => m.type === MovementType.SORTIE)
+                    .reduce((sum, m) => sum + m.quantity, 0);
+
+                return [
+                    p.name,
+                    p.category,
+                    p.typeProduct,
+                    totalIn.toString(),
+                    totalOut.toString(),
+                    p.quantity.toString(),
+                    (p.stockAlertThreshold || 10).toString(),
+                    p.quantity === 0 ? 'OUT' :
+                        (p.quantity <= (p.stockAlertThreshold || 10) ? 'LOW' : 'OK')
+                ];
+            }),
             theme: 'grid',
             headStyles: { fillColor: [46, 24, 16], textColor: [212, 175, 55] },
-            styles: { fontSize: 9 },
+            styles: { fontSize: 8 },
             rowPageBreak: 'auto',
             didParseCell: function (data) {
-                if (data.row.section === 'body' && data.column.index === 4) {
+                if (data.row.section === 'body' && data.column.index === 7) { // Status is now index 7
                     if (data.cell.raw === 'OUT') {
                         data.cell.styles.textColor = [220, 38, 38];
                         data.cell.styles.fontStyle = 'bold';

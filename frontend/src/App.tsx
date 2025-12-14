@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './components/Layout';
+import { useAuthStore } from './stores';
+import MainLayout from './components/MainLayout';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Inventory from './pages/Inventory';
 import StockIn from './pages/StockIn';
@@ -11,23 +13,40 @@ import History from './pages/History';
 import { ToastToaster } from './components/ui/Toast';
 
 function App() {
+    const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
     return (
         <>
             <ToastToaster />
-            <Layout>
-                <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/inventory" element={<Inventory />} />
-                    <Route path="/stock-in" element={<StockIn />} />
-                    <Route path="/stock-out" element={<StockOut />} />
-                    <Route path="/daily" element={<DailyViews />} />
-                    <Route path="/weekly" element={<WeeklyViews />} />
-                    <Route path="/alerts" element={<StockAlerts />} />
-                    <Route path="/history" element={<History />} />
+            <Routes>
+                <Route
+                    path="/login"
+                    element={isAuthenticated ? <Navigate to="/" replace /> : <Login />}
+                />
 
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-            </Layout>
+                <Route
+                    path="/*"
+                    element={
+                        isAuthenticated ? (
+                            <MainLayout>
+                                <Routes>
+                                    <Route path="/" element={<Dashboard />} />
+                                    <Route path="/inventory" element={<Inventory />} />
+                                    <Route path="/stock-in" element={<StockIn />} />
+                                    <Route path="/stock-out" element={<StockOut />} />
+                                    <Route path="/daily" element={<DailyViews />} />
+                                    <Route path="/weekly" element={<WeeklyViews />} />
+                                    <Route path="/alerts" element={<StockAlerts />} />
+                                    <Route path="/history" element={<History />} />
+                                    <Route path="*" element={<Navigate to="/" replace />} />
+                                </Routes>
+                            </MainLayout>
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )
+                    }
+                />
+            </Routes>
         </>
     );
 }

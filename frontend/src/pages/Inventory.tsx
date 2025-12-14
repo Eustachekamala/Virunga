@@ -106,7 +106,7 @@ const Inventory = () => {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
                 <div>
-                    <h2 className="text-4xl font-serif font-bold text-cocoa">
+                    <h2 className="md:text-4xl text-2xl font-serif font-bold text-cocoa">
                         {viewMode === 'LOW_STOCK' ? 'Low Stock Alerts' : 'Inventory'}
                     </h2>
                     <p className="text-cocoa/60 mt-2 font-light">

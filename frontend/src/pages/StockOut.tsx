@@ -62,23 +62,29 @@ const StockOut = () => {
         setSubmitting(true);
         try {
             // Add stock exit movement
-            await addStockExit({
-                productId: formData.productId,
-                quantity: formData.quantity,
-                date: new Date(formData.date).toISOString(),
-                receiver: formData.receiver,
-                user: formData.user,
-                purpose: formData.purpose,
-                notes: formData.notes,
-            });
-
-            // Update product quantity
+            // First update product quantity in backend
             await updateProduct(product.id, {
                 name: product.name,
                 quantity: product.quantity - formData.quantity,
                 description: product.description || '',
                 category: product.category,
                 typeProduct: product.typeProduct,
+                imageFile: undefined // Ensure we don't send file if not updating it
+            });
+
+            // Create date at noon to avoid timezone shifting the day when converting to ISO
+            const dateObj = new Date(formData.date);
+            dateObj.setHours(12, 0, 0, 0);
+
+            // If backend update succeeds, record the exit locally
+            await addStockExit({
+                productId: formData.productId,
+                quantity: formData.quantity,
+                date: dateObj.toISOString(),
+                receiver: formData.receiver,
+                user: formData.user,
+                purpose: formData.purpose,
+                notes: formData.notes,
             });
 
             showSuccess(`Successfully registered exit of ${formData.quantity} units of ${product.name}`);
@@ -111,8 +117,8 @@ const StockOut = () => {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="mb-8">
-                <h2 className="text-4xl font-serif font-bold text-cocoa flex items-center gap-3">
-                    <ArrowUpCircle className="w-10 h-10 text-orange-600" />
+                <h2 className="md:text-4xl text-2xl font-serif font-bold text-cocoa flex items-center gap-3">
+                    <ArrowUpCircle className="w-8 h-8 md:w-10 md:h-10 text-orange-600" />
                     Stock OUT (Sortie)
                 </h2>
                 <p className="text-cocoa/60 mt-2">Register equipment and materials taken from warehouse</p>
@@ -168,8 +174,8 @@ const StockOut = () => {
                                         </div>
                                     ) : (
                                         <div className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg ${willBeLowStock
-                                                ? 'text-orange-600 bg-orange-50'
-                                                : 'text-green-600 bg-green-50'
+                                            ? 'text-orange-600 bg-orange-50'
+                                            : 'text-green-600 bg-green-50'
                                             }`}>
                                             {willBeLowStock ? <AlertTriangle className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                                             <span className="font-medium">

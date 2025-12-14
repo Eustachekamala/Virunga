@@ -21,7 +21,8 @@ public class FileStorageServiceImpl implements FileStorageService {
         }
 
         // Ensure the upload directory exists
-        String uploadDir = "src/main/uploads/";
+        // Use a consistent path relative to project root
+        String uploadDir = "server/uploads/";
         File directory = new File(uploadDir);
         if (!directory.exists()) {
             directory.mkdirs();

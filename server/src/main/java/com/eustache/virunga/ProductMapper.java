@@ -12,7 +12,8 @@ public class ProductMapper {
     private static final int DEFAULT_STOCK_ALERT_THRESHOLD = 5;
 
     public ProductResponseDTO toDto(Product product) {
-        if (product == null) return null;
+        if (product == null)
+            return null;
 
         boolean lowStock = product.getQuantity() != null
                 && product.getStockAlertThreshold() != null
@@ -29,8 +30,8 @@ public class ProductMapper {
                 product.getCreatedAt(),
                 product.getUpdatedAt(),
                 product.getImageFile(),
-                lowStock
-        );
+                lowStock,
+                product.getCategory());
     }
 
     public Product toEntity(ProductDTO productDTO, String image) {
@@ -49,8 +50,7 @@ public class ProductMapper {
         product.setName(productDTO.getName());
         product.setQuantity(productDTO.getQuantity() != null ? productDTO.getQuantity() : 0);
         product.setStockAlertThreshold(
-                productDTO.getQuantity() != null ? productDTO.getQuantity() : DEFAULT_STOCK_ALERT_THRESHOLD
-        );
+                productDTO.getQuantity() != null ? productDTO.getQuantity() : DEFAULT_STOCK_ALERT_THRESHOLD);
         product.setCategory(productDTO.getCategory());
         product.setImageFile(image);
         product.setDescription(productDTO.getDescription());
