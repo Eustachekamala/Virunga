@@ -113,7 +113,7 @@ public class ProductServiceImpl implements ProductService {
             // To update the status and save
             updateProductStatus(existingProduct);
             productDAO.save(existingProduct);
-            
+
             log.info("Product updated: {}", existingProduct);
             checkAndLogLowStock(existingProduct);
 
@@ -123,16 +123,17 @@ public class ProductServiceImpl implements ProductService {
             // Handles Product not found
             log.error("Product not found: {}", ex.getMessage());
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404
-            
+
         } catch (DataIntegrityViolationException ex) {
             // Handles Duplicate name, etc.
             log.error("Data integrity violation during update: {}", ex.getMessage());
-            return new ResponseEntity<>("Update failed: A field violates a unique constraint (e.g., duplicate name).", HttpStatus.CONFLICT); // Return 409
-            
+            return new ResponseEntity<>("Update failed: A field violates a unique constraint (e.g., duplicate name).",
+                    HttpStatus.CONFLICT); // Return 409
+
         } catch (Exception ex) {
             // Handles all other unexpected errors (e.g., file system failure in saveImage)
             log.error("Unexpected failure to update product: {}", ex.getMessage(), ex);
-            // We will return a 400 because the client's request might be malformed, 
+            // We will return a 400 because the client's request might be malformed,
             // but the core server issue is logged as an ERROR.
             return new ResponseEntity<>("Update failed due to server processing error.", HttpStatus.BAD_REQUEST);
         }
@@ -309,6 +310,13 @@ public class ProductServiceImpl implements ProductService {
     private void checkAndLogLowStock(Product product) {
         if (product.getQuantity() != null && product.getQuantity() <= product.getStockAlertThreshold()) {
             log.warn("Product '{}' is low on stock! Current quantity: {}", product.getName(), product.getQuantity());
+
+            String subject = "Low Stock Alert: " + product.getName();
+            String message = String.format(
+                    "Product: %s\nCurrent Quantity: %d\nThreshold: %d\n\nPlease restock immediately.",
+                    product.getName(), product.getQuantity(), product.getStockAlertThreshold());
+
+            emailService.sendEmail("eustachekamala.dev@gmail.com", subject, message);
         }
     }
 
@@ -367,7 +375,8 @@ public class ProductServiceImpl implements ProductService {
                     "Stock Alert: Low Inventory Detected",
                     message.toString());
 
-            // log.warn("Low stock alert email sent to admin. Products: {}", lowStockProducts.size());
+            // log.warn("Low stock alert email sent to admin. Products: {}",
+            // lowStockProducts.size());
         }
 
         log.info("Low stock check completed.");
