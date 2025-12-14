@@ -56,7 +56,7 @@ const StockOut = () => {
         const remainingStock = product.quantity - formData.quantity;
         const threshold = product.stockAlertThreshold || 10;
         if (remainingStock <= threshold) {
-            showWarning(`Warning: Stock will be low after this exit (${remainingStock} units remaining)`);
+            showWarning(`Warning: Stock will be low after this exit (${remainingStock} units remaining). An alert email will be sent.`);
         }
 
         setSubmitting(true);
