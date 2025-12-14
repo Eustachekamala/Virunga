@@ -115,7 +115,7 @@ const StockOut = () => {
         (selectedProduct.quantity - formData.quantity) <= (selectedProduct.stockAlertThreshold || 10);
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto px-4 py-6">
             <div className="mb-8">
                 <h2 className="md:text-4xl text-2xl font-serif font-bold text-cocoa flex items-center gap-3">
                     <ArrowUpCircle className="w-8 h-8 md:w-10 md:h-10 text-orange-600" />
@@ -124,7 +124,7 @@ const StockOut = () => {
                 <p className="text-cocoa/60 mt-2">Register equipment and materials taken from warehouse</p>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg border border-cocoa/5 p-8">
+            <div className="bg-white rounded-2xl shadow-lg border border-cocoa/5 p-6 md:p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Product Selection */}
                     <div>
@@ -267,11 +267,11 @@ const StockOut = () => {
                     </div>
 
                     {/* Submit Button */}
-                    <div className="flex gap-4 pt-4">
+                    <div className="flex flex-col md:flex-row gap-4 pt-4">
                         <button
                             type="submit"
                             disabled={submitting || !formData.productId || formData.quantity <= 0 || isInsufficientStock}
-                            className="flex-1 px-8 py-4 bg-gradient-to-r from-orange-600 to-orange-700 text-white hover:from-orange-700 hover:to-orange-800 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full md:flex-1 px-8 py-4 bg-gradient-to-r from-orange-600 to-orange-700 text-white hover:from-orange-700 hover:to-orange-800 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             <Send className="w-5 h-5" />
                             {submitting ? 'Recording...' : 'Register Stock Exit'}
@@ -279,7 +279,7 @@ const StockOut = () => {
                         <button
                             type="button"
                             onClick={() => window.history.back()}
-                            className="px-8 py-4 bg-white border-2 border-cocoa/20 text-cocoa hover:bg-cocoa/5 rounded-xl font-medium text-lg transition-all"
+                            className="w-full md:w-auto px-8 py-4 bg-white border-2 border-cocoa/20 text-cocoa hover:bg-cocoa/5 rounded-xl font-medium text-lg transition-all"
                         >
                             Cancel
                         </button>

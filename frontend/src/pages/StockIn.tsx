@@ -106,7 +106,7 @@ const StockIn = () => {
     const selectedProduct = products.find(p => p.id === formData.productId);
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto px-4 py-6">
 
             {/* HEADER */}
             <div className="mb-8">
@@ -119,7 +119,7 @@ const StockIn = () => {
                 </p>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-lg border border-cocoa/5 p-8">
+            <div className="bg-white rounded-2xl shadow-lg border border-cocoa/5 p-6 md:p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
 
                     {/* Product Selection */}
@@ -254,11 +254,11 @@ const StockIn = () => {
                     </div>
 
                     {/* Buttons */}
-                    <div className="flex gap-4 pt-4">
+                    <div className="flex flex-col md:flex-row gap-4 pt-4">
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="flex-1 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="w-full md:flex-1 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:shadow-xl"
                         >
                             {submitting ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -271,7 +271,7 @@ const StockIn = () => {
                         <button
                             type="button"
                             onClick={() => window.history.back()}
-                            className="px-8 py-4 bg-white border-2 border-cocoa/20 text-cocoa rounded-xl font-medium text-lg hover:bg-cocoa/5"
+                            className="w-full md:w-auto px-8 py-4 bg-white border-2 border-cocoa/20 text-cocoa rounded-xl font-medium text-lg hover:bg-cocoa/5 transition-all"
                         >
                             Cancel
                         </button>
