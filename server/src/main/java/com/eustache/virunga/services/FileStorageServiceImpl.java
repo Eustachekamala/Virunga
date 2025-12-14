@@ -3,36 +3,31 @@ package com.eustache.virunga.services;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+import lombok.RequiredArgsConstructor;
+import com.cloudinary.Cloudinary;
+import java.util.Map;
+
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 @Service
+@RequiredArgsConstructor
 public class FileStorageServiceImpl implements FileStorageService {
 
-    @SuppressWarnings("null")
+    private final Cloudinary cloudinary;
+
+    @SuppressWarnings("rawtypes")
     @Override
     public String saveImage(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new IOException("Cannot upload empty file");
         }
 
-        // Ensure the upload directory exists
-        // Use a consistent path relative to project root
-        String uploadDir = "server/uploads/";
-        File directory = new File(uploadDir);
-        if (!directory.exists()) {
-            directory.mkdirs();
+        try {
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), Map.of(
+                    "folder", "virunga_products"));
+            return uploadResult.get("secure_url").toString();
+        } catch (IOException e) {
+            throw new IOException("Failed to upload image to Cloudinary", e);
         }
-
-        // Save file with a unique name
-        String fileName = file.getOriginalFilename();
-        Path filePath = Paths.get(uploadDir + fileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        return fileName.toString();
     }
 }

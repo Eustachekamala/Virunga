@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 @Tag(name = "Upload Controller", description = "Controller for uploading files")
 public class UploadController {
 
-    private static final String UPLOAD_DIR = "server/uploads/";
+    private static final String UPLOAD_DIR = "uploads/";
 
     @GetMapping(value = "/uploads/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
