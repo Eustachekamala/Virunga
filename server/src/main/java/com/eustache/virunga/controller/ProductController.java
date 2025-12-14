@@ -97,7 +97,7 @@ public class ProductController {
             @ApiResponse(responseCode = "201", description = "Updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid data")
     })
-    @PatchMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateProduct(
             @PathVariable Integer id,
             @ModelAttribute ProductDTO productDTO) {

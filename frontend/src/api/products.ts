@@ -61,37 +61,42 @@ export const createProduct = async (data: CreateProductDTO): Promise<string> => 
     formData.append('description', data.description);
     formData.append('category', data.category);
     formData.append('typeProduct', data.typeProduct);
+
     if (data.imageFile) {
         formData.append('imageFile', data.imageFile);
     }
 
-    const response = await apiClient.post(`${PRODUCTS_BASE}/insert`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+    const response = await apiClient.post(
+        `${PRODUCTS_BASE}/insert`,
+        formData
+    );
+
     return response.data;
 };
 
 /**
  * Update an existing product
  */
-export const updateProduct = async (id: number, data: CreateProductDTO): Promise<string> => {
+export const updateProduct = async (
+    id: number,
+    data: CreateProductDTO
+): Promise<string> => {
     const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('quantity', data.quantity.toString());
-    formData.append('description', data.description);
-    formData.append('category', data.category);
-    formData.append('typeProduct', data.typeProduct);
-    if (data.imageFile) {
-        formData.append('imageFile', data.imageFile);
-    }
 
-    const response = await apiClient.patch(`${PRODUCTS_BASE}/update/${id}`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+    // Append only provided fields (safe partial update)
+    if (data.name) formData.append('name', data.name);
+    if (data.quantity !== undefined)
+        formData.append('quantity', data.quantity.toString());
+    if (data.description) formData.append('description', data.description);
+    if (data.category) formData.append('category', data.category);
+    if (data.typeProduct) formData.append('typeProduct', data.typeProduct);
+    if (data.imageFile) formData.append('imageFile', data.imageFile);
+
+    const response = await apiClient.post(
+        `${PRODUCTS_BASE}/update/${id}`,
+        formData
+    );
+
     return response.data;
 };
 
