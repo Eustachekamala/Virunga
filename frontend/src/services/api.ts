@@ -63,6 +63,6 @@ export const updateProduct = async (id: number, data: CreateProductDTO): Promise
     if (data.typeProduct?.trim()) formData.append('typeProduct', data.typeProduct);
     if (data.imageFile) formData.append('imageFile', data.imageFile);
 
-    const response = await apiClient.patch(`/products/update/${id}`, formData);
+    const response = await apiClient.post(`/products/update/${id}`, formData);
     return response.data;
 };
