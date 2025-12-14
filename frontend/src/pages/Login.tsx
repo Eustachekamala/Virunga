@@ -125,7 +125,7 @@ const Login = () => {
                     <div className="pt-6 text-center border-t border-dashed border-cocoa/10">
                         <p className="text-sm text-cocoa/50">
                             Having trouble accessing the system? <br />
-                            <a href="#" className="text-gold font-semibold hover:underline decoration-gold underline-offset-4">Contact IT Support</a>
+                            <a href="mailto:eustachekamala.dev@gmail.com" className="text-gold font-semibold hover:underline decoration-gold underline-offset-4">Contact IT Support</a>
                         </p>
                     </div>
                 </div>

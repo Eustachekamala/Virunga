@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import ProductCard from '../components/ProductCard';
 import ProductModal from '../components/ProductModal';
+import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import {
     createProduct,
     deleteProduct,
@@ -24,6 +25,8 @@ const Inventory = () => {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [productToDelete, setProductToDelete] = useState<{ id: number, name: string } | null>(null);
 
     // Filters state
     const [searchQuery, setSearchQuery] = useState('');
@@ -61,7 +64,7 @@ const Inventory = () => {
             fetchProducts();
         }, 500); // Debounce 500ms
         return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery, selectedType, selectedCategory, viewMode]);
 
 
@@ -74,13 +77,22 @@ const Inventory = () => {
         fetchProducts();
     };
 
-    const handleDelete = useCallback(async (id: number) => {
-        if (confirm('Are you sure you want to delete this product?')) {
-            await deleteProduct(id);
-            // update local list to avoid refetching entire list and reduce render churn
-            setProducts(prev => prev.filter(p => p.id !== id));
+    const handleDelete = useCallback((id: number) => {
+        const product = products.find(p => p.id === id);
+        if (product) {
+            setProductToDelete({ id: product.id, name: product.name });
+            setDeleteModalOpen(true);
         }
-    }, []);
+    }, [products]);
+
+    const handleConfirmDelete = async () => {
+        if (!productToDelete) return;
+
+        await deleteProduct(productToDelete.id);
+        setProducts(prev => prev.filter(p => p.id !== productToDelete.id));
+        setDeleteModalOpen(false);
+        setProductToDelete(null);
+    };
 
     const openCreateModal = useCallback(() => {
         setEditingProduct(null);
@@ -224,6 +236,13 @@ const Inventory = () => {
                 onClose={() => setIsModalOpen(false)}
                 onSubmit={handleCreateOrUpdate}
                 productToEdit={editingProduct}
+            />
+
+            <DeleteConfirmationModal
+                isOpen={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                itemName={productToDelete?.name}
             />
         </div>
     );
