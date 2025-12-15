@@ -147,7 +147,7 @@ const StockOut = () => {
                                 required
                                 value={formData.productId}
                                 onChange={(e) => setFormData({ ...formData, productId: parseInt(e.target.value) })}
-                                className="w-full pl-4 pr-10 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-red-500/50 outline-none text-base transition-all appearance-none shadow-sm font-medium"
+                                className="w-full pl-4 pr-10 py-4 bg-white/50 hover:bg-white/80 focus:bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-green-500/50 outline-none text-base transition-all appearance-none shadow-sm font-medium"
                             >
                                 <option value={0}>Select a product to remove...</option>
                                 {products.length === 0 && (

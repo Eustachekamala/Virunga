@@ -143,7 +143,7 @@ const StockIn = () => {
                                 disabled={loading}
                                 value={formData.productId}
                                 onChange={(e) => setFormData({ ...formData, productId: parseInt(e.target.value) })}
-                                className="w-full pl-4 pr-10 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-green-500/50 outline-none text-base transition-all appearance-none shadow-sm font-medium"
+                                className="w-full pl-4 pr-10 py-4 bg-white/50 hover:bg-white/80 focus:bg-white border border-cocoa/10 rounded-xl text-cocoa focus:ring-2 focus:ring-green-500/50 outline-none text-base transition-all appearance-none shadow-sm font-medium"
                             >
                                 <option value={0}>Select a product to add stock...</option>
                                 {products.length === 0 && (
@@ -173,7 +173,7 @@ const StockIn = () => {
                                 min="1"
                                 value={formData.quantity || ''}
                                 onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
-                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm"
+                                className="w-full px-4 py-4 bg-white/50 hover:bg-white/80 focus:bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm"
                                 placeholder="0"
                             />
 
@@ -198,7 +198,7 @@ const StockIn = () => {
                                 required
                                 value={formData.date}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm"
+                                className="w-full px-4 py-4 bg-white/50 hover:bg-white/80 focus:bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm"
                             />
                         </div>
                     </div>
@@ -214,7 +214,7 @@ const StockIn = () => {
                                 type="text"
                                 value={formData.reference}
                                 onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
+                                className="w-full px-4 py-4 bg-white/50 hover:bg-white/80 focus:bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
                                 placeholder="e.g. INV-2024-001"
                             />
                         </div>
@@ -228,7 +228,7 @@ const StockIn = () => {
                                 type="text"
                                 value={formData.supplier}
                                 onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
-                                className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
+                                className="w-full px-4 py-4 bg-white/50 hover:bg-white/80 focus:bg-white border border-cocoa/10 rounded-xl text-cocoa text-base transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
                                 placeholder="e.g. Cocoa Direct Ltd."
                             />
                         </div>
@@ -244,7 +244,7 @@ const StockIn = () => {
                             type="text"
                             value={formData.reason}
                             onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                            className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
+                            className="w-full px-4 py-4 bg-white/50 hover:bg-white/80 focus:bg-white border border-cocoa/10 rounded-xl text-cocoa transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
                             placeholder="e.g. Weekly Restock"
                         />
                     </div>
@@ -259,7 +259,7 @@ const StockIn = () => {
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             rows={3}
-                            className="w-full px-4 py-4 bg-white border border-cocoa/10 rounded-xl text-cocoa resize-none transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
+                            className="w-full px-4 py-4 bg-white/50 hover:bg-white/80 focus:bg-white border border-cocoa/10 rounded-xl text-cocoa resize-none transition-all focus:ring-2 focus:ring-green-500/50 outline-none shadow-sm placeholder:text-cocoa/30"
                             placeholder="Any checks or comments..."
                         />
                     </div>
@@ -282,7 +282,7 @@ const StockIn = () => {
                         <button
                             type="button"
                             onClick={() => window.history.back()}
-                            className="w-full md:w-auto px-8 py-4 bg-white text-cocoa border border-cocoa/10 rounded-xl font-bold text-lg hover:bg-cocoa/5 transition-all active:scale-95"
+                            className="w-full md:w-auto px-8 py-4 bg-white/80 text-cocoa border border-cocoa/10 rounded-xl font-bold text-lg hover:bg-white transition-all active:scale-95"
                         >
                             Cancel
                         </button>
@@ -291,13 +291,13 @@ const StockIn = () => {
             </div>
 
             {/* Info Box */}
-            <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 flex flex-col md:flex-row gap-4">
-                <div className="bg-blue-100 p-3 rounded-xl h-fit w-fit">
-                    <Info className="w-6 h-6 text-blue-600" />
+            <div className="glass-panel border-l-[6px] border-l-green-500 bg-green-50/30 p-6 rounded-2xl flex flex-col md:flex-row gap-4">
+                <div className="bg-green-100 p-3 rounded-xl h-fit w-fit">
+                    <Info className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                    <h4 className="font-bold text-blue-900 mb-2">About Stock Entries</h4>
-                    <ul className="text-sm text-blue-800/80 space-y-1 list-disc list-inside">
+                    <h4 className="font-bold text-cocoa mb-2">About Stock Entries</h4>
+                    <ul className="text-sm text-cocoa/70 space-y-1 list-disc list-inside font-medium">
                         <li>This action adds quantities to your existing inventory.</li>
                         <li>Stock entries are permanent and logged in the history.</li>
                         <li>Ensure the reference matches your physical invoice for easier auditing.</li>
