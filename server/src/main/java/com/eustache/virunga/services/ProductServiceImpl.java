@@ -12,6 +12,7 @@ import com.eustache.virunga.model.TypeProduct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,7 @@ public class ProductServiceImpl implements ProductService {
      *         fails
      */
     @Override
+    @CachePut(value = "PRODUCT_CACHE", key = "#result.id")
     public ResponseEntity<String> createProduct(ProductDTO productDTO) {
         try {
             String imagePath = null;
@@ -90,6 +92,7 @@ public class ProductServiceImpl implements ProductService {
      *         or an error message and HTTP status BAD_REQUEST if update fails
      */
     @Override
+    @CachePut(value = "PRODUCT_CACHE", key = "#result.id")
     public ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO) {
         try {
             Product existingProduct = productDAO.findById(id)

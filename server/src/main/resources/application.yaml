@@ -19,6 +19,13 @@ spring:
     properties:
       hibernate:
         '[format_sql]': true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cache:
+    type: redis
   
   aop:
     proxy-target-class: true

@@ -81,6 +81,18 @@
 			<artifactId>cloudinary-taglib</artifactId>
 			<version>1.36.0</version>
 		</dependency>
+		<!--Redis-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<!--Docker-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
     </dependencies>
 	<dependencyManagement>
 		<dependencies>
