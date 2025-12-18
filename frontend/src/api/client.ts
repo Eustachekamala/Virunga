@@ -5,7 +5,6 @@ export const API_BASE_URL = 'https://virunga-product-app.onrender.com/api/v1';
 // Create axios instance with default config
 export const apiClient = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 20000, // 20 seconds
 });
 
 // Request interceptor

@@ -45,8 +45,11 @@ const Inventory = () => {
 
             if (viewMode === 'LOW_STOCK') {
                 data = await getLowStockProducts();
-            } else if (searchQuery) {
-                data = await getProductByName(searchQuery);
+            } else if (searchQuery.trim()) {
+                // Search by name
+                const data = await getProductByName(searchQuery.trim());
+                    setProducts(data ?? []);
+
             } else if (selectedType !== 'ALL') {
                 data = await getProductsByType(selectedType);
             } else if (selectedCategory !== 'ALL') {
@@ -57,6 +60,7 @@ const Inventory = () => {
             setProducts(data);
         } catch (error) {
             console.error('Failed to fetch products', error);
+            setProducts([]); // Set empty array on error
         } finally {
             setLoading(false);
         }
@@ -68,7 +72,7 @@ const Inventory = () => {
             fetchProducts();
         }, 500); // Debounce 500ms
         return () => clearTimeout(timer);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery, selectedType, selectedCategory, viewMode]);
 
 
