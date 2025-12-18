@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync(proxyTargetClass = true)
-@EnableCaching
+//@EnableCaching
 public class ProductApplication {
 
 	public static void main(String[] args) {
