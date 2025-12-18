@@ -19,15 +19,15 @@ public interface ProductService {
 
     ResponseEntity<String> deleteProduct(Integer id);
 
-    ResponseEntity<List<ProductResponseDTO>> getAllProducts();
+    List<ProductResponseDTO> getAllProducts();
 
-    ResponseEntity<ProductResponseDTO> getProductById(Integer id);
+    ProductResponseDTO getProductById(Integer id);
 
-    ResponseEntity<List<ProductResponseDTO>> getProductByName(String name);
+    List<ProductResponseDTO> getProductByName(String name);
 
-    ResponseEntity<List<ProductResponseDTO>> getProductsByType(TypeProduct type);
+    List<ProductResponseDTO> getProductsByType(TypeProduct type);
 
-    ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(Category category);
+    List<ProductResponseDTO> getProductsByCategory(Category category);
 
-    ResponseEntity<List<ProductResponseDTO>> getLowStockProducts();
+    List<ProductResponseDTO> getLowStockProducts();
 }

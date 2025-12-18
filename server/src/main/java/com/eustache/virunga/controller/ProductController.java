@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -34,7 +33,11 @@ public class ProductController {
     })
     @GetMapping("/allProducts")
     public ResponseEntity<List<ProductResponseDTO>> getAll() {
-        return productService.getAllProducts();
+        List<ProductResponseDTO> products = productService.getAllProducts();
+        if (products == null || products.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
+        }
+        return ResponseEntity.ok(products);
     }
 
     @Operation(summary = "Insert a new product")
@@ -56,13 +59,16 @@ public class ProductController {
     @GetMapping("/type/{type}")
     public ResponseEntity<List<ProductResponseDTO>> getProductsByType(
             @PathVariable String type) {
-        TypeProduct typeEnum;
         try {
-            typeEnum = TypeProduct.valueOf(type.toUpperCase());
+            TypeProduct typeEnum = TypeProduct.valueOf(type.toUpperCase());
+            List<ProductResponseDTO> products = productService.getProductsByType(typeEnum);
+            if (products == null || products.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
+            }
+            return ResponseEntity.ok(products);
         } catch (IllegalArgumentException ex) {
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
-        return productService.getProductsByType(typeEnum);
     }
 
     @Operation(summary = "Get Products by category")
@@ -73,13 +79,16 @@ public class ProductController {
     @GetMapping("/category/{category}")
     public ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(
             @PathVariable String category) {
-        Category categoryEnum;
         try {
-            categoryEnum = Category.valueOf(category.toUpperCase());
+            Category categoryEnum = Category.valueOf(category.toUpperCase());
+            List<ProductResponseDTO> products = productService.getProductsByCategory(categoryEnum);
+            if (products == null || products.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
+            }
+            return ResponseEntity.ok(products);
         } catch (IllegalArgumentException ex) {
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
-        return productService.getProductsByCategory(categoryEnum);
     }
 
     @Operation(summary = "Get Products with low stocks")
@@ -89,7 +98,11 @@ public class ProductController {
     })
     @GetMapping("/low-stock")
     public ResponseEntity<List<ProductResponseDTO>> getLowProductStocks() {
-        return productService.getLowStockProducts();
+        List<ProductResponseDTO> products = productService.getLowStockProducts();
+        if (products == null || products.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
+        }
+        return ResponseEntity.ok(products);
     }
 
     @Operation(summary = "Update a product")
@@ -112,7 +125,11 @@ public class ProductController {
     @GetMapping("/getByName/{name}")
     public ResponseEntity<List<ProductResponseDTO>> getProductByName(
             @PathVariable String name) {
-        return productService.getProductByName(name);
+        List<ProductResponseDTO> products = productService.getProductByName(name);
+        if (products == null || products.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
+        }
+        return ResponseEntity.ok(products);
     }
 
     @Operation(summary = "Get product by ID")
@@ -123,7 +140,15 @@ public class ProductController {
     @GetMapping("/getById/{id}")
     public ResponseEntity<ProductResponseDTO> getProductById(
             @PathVariable Integer id) {
-        return productService.getProductById(id);
+        try {
+            ProductResponseDTO product = productService.getProductById(id);
+            if (product == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(product);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @Operation(summary = "Delete a product")

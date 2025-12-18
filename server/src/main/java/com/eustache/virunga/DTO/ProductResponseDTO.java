@@ -4,6 +4,7 @@ import com.eustache.virunga.model.Category;
 import com.eustache.virunga.model.Status;
 import com.eustache.virunga.model.TypeProduct;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 public record ProductResponseDTO(
@@ -18,5 +19,5 @@ public record ProductResponseDTO(
                 LocalDate updatedAt,
                 String imageFile,
                 boolean isLowStock,
-                Category category) {
+                Category category) implements Serializable{
 }

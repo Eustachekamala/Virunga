@@ -2,6 +2,7 @@ package com.eustache.virunga.services;
 
 import com.eustache.virunga.DTO.ProductDTO;
 import com.eustache.virunga.DTO.ProductResponseDTO;
+import com.eustache.virunga.Helper.CacheNames;
 import com.eustache.virunga.ProductMapper;
 import com.eustache.virunga.DAO.ProductDAO;
 import com.eustache.virunga.model.Category;
@@ -12,7 +13,8 @@ import com.eustache.virunga.model.TypeProduct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,7 +49,17 @@ public class ProductServiceImpl implements ProductService {
      *         fails
      */
     @Override
-    @CachePut(value = "PRODUCT_CACHE", key = "#result.id")
+    @CacheEvict(
+        value = {
+            CacheNames.PRODUCT_BY_ID,
+            CacheNames.PRODUCT_LIST,
+            CacheNames.PRODUCT_BY_CATEGORY,
+            CacheNames.PRODUCT_BY_TYPE,
+            CacheNames.PRODUCT_BY_NAME,
+            CacheNames.LOW_STOCK
+        },
+        allEntries = true
+    )
     public ResponseEntity<String> createProduct(ProductDTO productDTO) {
         try {
             String imagePath = null;
@@ -92,7 +103,17 @@ public class ProductServiceImpl implements ProductService {
      *         or an error message and HTTP status BAD_REQUEST if update fails
      */
     @Override
-    @CachePut(value = "PRODUCT_CACHE", key = "#result.id")
+    @CacheEvict(
+        value = {
+            CacheNames.PRODUCT_BY_ID,
+            CacheNames.PRODUCT_LIST,
+            CacheNames.PRODUCT_BY_CATEGORY,
+            CacheNames.PRODUCT_BY_TYPE,
+            CacheNames.PRODUCT_BY_NAME,
+            CacheNames.LOW_STOCK
+        },
+        allEntries = true
+    )
     public ResponseEntity<String> updateProduct(Integer id, ProductDTO productDTO) {
         try {
             Product existingProduct = productDAO.findById(id)
@@ -152,6 +173,17 @@ public class ProductServiceImpl implements ProductService {
      *         exist
      */
     @Override
+    @CacheEvict(
+        value = {
+            CacheNames.PRODUCT_BY_ID,
+            CacheNames.PRODUCT_LIST,
+            CacheNames.PRODUCT_BY_CATEGORY,
+            CacheNames.PRODUCT_BY_TYPE,
+            CacheNames.PRODUCT_BY_NAME,
+            CacheNames.LOW_STOCK
+        },
+        allEntries = true
+    )
     public ResponseEntity<String> deleteProduct(Integer id) {
         try {
             if (!productDAO.existsById(id)) {
@@ -174,18 +206,14 @@ public class ProductServiceImpl implements ProductService {
      *         returns an empty list if no products are found
      */
     @Override
-    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
-        try {
-            List<ProductResponseDTO> products = productDAO.findAll()
-                    .stream()
-                    .map(productMapper::toDto)
-                    .collect(Collectors.toList());
-            return new ResponseEntity<>(products, HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Failed to fetch products: {}", ex.getMessage(), ex);
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-        }
+    @Cacheable(cacheNames = CacheNames.PRODUCT_LIST)
+    public List<ProductResponseDTO> getAllProducts() {
+        return productDAO.findAll()
+                .stream()
+                .map(productMapper::toDto)
+                .toList();
     }
+
 
     /**
      * Retrieves a product by its ID.
@@ -196,16 +224,12 @@ public class ProductServiceImpl implements ProductService {
      *         or HTTP status NOT_FOUND if the product doesn't exist
      */
     @Override
-    public ResponseEntity<ProductResponseDTO> getProductById(Integer id) {
-        try {
+    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_ID, key = "#id")
+    public ProductResponseDTO getProductById(Integer id) {
             ProductResponseDTO productResponseDTO = productMapper.toDto(
                     productDAO.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id)));
-            return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Failed to fetch product: {}", ex.getMessage(), ex);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+            return productResponseDTO;
     }
 
     /**
@@ -217,17 +241,13 @@ public class ProductServiceImpl implements ProductService {
      *         returns an empty list if no products are found
      */
     @Override
-    public ResponseEntity<List<ProductResponseDTO>> getProductByName(String name) {
-        try {
+    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_NAME, key = "#name.toLowerCase()")
+    public List<ProductResponseDTO> getProductByName(String name) {
             List<ProductResponseDTO> products = productDAO.findByName(name)
                     .stream()
                     .map(productMapper::toDto)
                     .collect(Collectors.toList());
-            return new ResponseEntity<>(products, HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Failed to fetch products by name: {}", ex.getMessage(), ex);
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-        }
+            return products;
     }
 
     /**
@@ -240,17 +260,13 @@ public class ProductServiceImpl implements ProductService {
      *         operation fails
      */
     @Override
-    public ResponseEntity<List<ProductResponseDTO>> getProductsByType(TypeProduct type) {
-        try {
-            List<ProductResponseDTO> products = productDAO.findByTypeProduct(type)
-                    .stream()
-                    .map(productMapper::toDto)
-                    .collect(Collectors.toList());
-            return new ResponseEntity<>(products, HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Failed to fetch products by type {}: {}", type, ex.getMessage(), ex);
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_TYPE, key = "#type.name()")
+    public List<ProductResponseDTO> getProductsByType(TypeProduct type) {
+        List<ProductResponseDTO> products = productDAO.findByTypeProduct(type)
+                .stream()
+                .map(productMapper::toDto)
+                .collect(Collectors.toList());
+        return products;
     }
 
     /**
@@ -263,17 +279,13 @@ public class ProductServiceImpl implements ProductService {
      *         operation fails
      */
     @Override
-    public ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(Category category) {
-        try {
-            List<ProductResponseDTO> products = productDAO.findByCategory(category)
-                    .stream()
-                    .map(productMapper::toDto)
-                    .collect(Collectors.toList());
-            return new ResponseEntity<>(products, HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Failed to fetch products by category {}: {}", category, ex.getMessage(), ex);
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_CATEGORY, key = "#category.name()")
+    public List<ProductResponseDTO> getProductsByCategory(Category category) {
+        List<ProductResponseDTO> products = productDAO.findByCategory(category)
+                .stream()
+                .map(productMapper::toDto)
+                .collect(Collectors.toList());
+        return products;
     }
 
     /**
@@ -285,8 +297,8 @@ public class ProductServiceImpl implements ProductService {
      *         returns an empty list if no low stock products are found
      */
     @Override
-    public ResponseEntity<List<ProductResponseDTO>> getLowStockProducts() {
-        try {
+    @Cacheable(cacheNames = CacheNames.LOW_STOCK)
+    public List<ProductResponseDTO> getLowStockProducts() {
             List<ProductResponseDTO> lowStockProducts = productDAO.findAll()
                     .stream()
                     .filter(p -> p.getQuantity() != null && p.getQuantity() <= DEFAULT_STOCK_ALERT_THRESHOLD)
@@ -297,11 +309,7 @@ public class ProductServiceImpl implements ProductService {
                 log.warn("Low stock products: {}", lowStockProducts);
             }
 
-            return new ResponseEntity<>(lowStockProducts, HttpStatus.OK);
-        } catch (Exception ex) {
-            log.error("Failed to fetch low stock products: {}", ex.getMessage(), ex);
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-        }
+            return lowStockProducts;
     }
 
     // Helper method to log low stock for a single product
@@ -350,6 +358,17 @@ public class ProductServiceImpl implements ProductService {
      */
     @Async
     @Scheduled(cron = "0 0 */12 * * *") // every 12 hours
+    @CacheEvict(
+        value = {
+            CacheNames.PRODUCT_BY_ID,
+            CacheNames.PRODUCT_LIST,
+            CacheNames.PRODUCT_BY_CATEGORY,
+            CacheNames.PRODUCT_BY_TYPE,
+            CacheNames.PRODUCT_BY_NAME,
+            CacheNames.LOW_STOCK
+        },
+        allEntries = true
+    )
     public void scheduledLowStockCheck() {
         log.info("Running scheduled low stock check...");
 
