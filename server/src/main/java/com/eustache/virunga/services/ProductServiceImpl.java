@@ -38,16 +38,6 @@ public class ProductServiceImpl implements ProductService {
 
     private static final int DEFAULT_STOCK_ALERT_THRESHOLD = 5;
 
-    /**
-     * Creates a new product in the system.
-     * 
-     * @param productDTO The product data transfer object containing the product
-     *                   information
-     * @return ResponseEntity containing a success message and HTTP status CREATED
-     *         if successful,
-     *         or an error message and HTTP status INTERNAL_SERVER_ERROR if creation
-     *         fails
-     */
     @Override
     @CacheEvict(
         value = {
@@ -72,10 +62,8 @@ public class ProductServiceImpl implements ProductService {
             if (product.getQuantity() == null)
                 product.setQuantity(0);
             product.setStockAlertThreshold(DEFAULT_STOCK_ALERT_THRESHOLD);
-            // To update the status
             updateProductStatus(product);
 
-            // This will handle duplicate product names
             try {
                 productDAO.save(product);
             } catch (DataIntegrityViolationException e) {
@@ -92,16 +80,6 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    /**
-     * Updates an existing product in the system.
-     * 
-     * @param id         The ID of the product to update
-     * @param productDTO The product data transfer object containing the updated
-     *                   product information
-     * @return ResponseEntity containing a success message and HTTP status OK if
-     *         successful,
-     *         or an error message and HTTP status BAD_REQUEST if update fails
-     */
     @Override
     @CacheEvict(
         value = {
@@ -119,22 +97,17 @@ public class ProductServiceImpl implements ProductService {
             Product existingProduct = productDAO.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id));
 
-            // Safe update logic using Optional
             Optional.ofNullable(productDTO.getName()).ifPresent(existingProduct::setName);
             Optional.ofNullable(productDTO.getCategory()).ifPresent(existingProduct::setCategory);
             Optional.ofNullable(productDTO.getDescription()).ifPresent(existingProduct::setDescription);
             Optional.ofNullable(productDTO.getQuantity()).ifPresent(existingProduct::setQuantity);
             Optional.ofNullable(productDTO.getTypeProduct()).ifPresent(existingProduct::setTypeProduct);
 
-            // Image file handling
             if (productDTO.getImageFile() != null && !productDTO.getImageFile().isEmpty()) {
                 String newImageFile = fileStorageService.saveImage(productDTO.getImageFile());
-                // It is VITAL that newImageFile is not null/invalid here.
-                // If saveImage throws an exception, it goes to the catch block.
                 Optional.ofNullable(newImageFile).ifPresent(existingProduct::setImageFile);
             }
 
-            // To update the status and save
             updateProductStatus(existingProduct);
             productDAO.save(existingProduct);
 
@@ -144,34 +117,20 @@ public class ProductServiceImpl implements ProductService {
             return new ResponseEntity<>("Product updated successfully", HttpStatus.OK);
 
         } catch (IllegalArgumentException ex) {
-            // Handles Product not found
             log.error("Product not found: {}", ex.getMessage());
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
 
         } catch (DataIntegrityViolationException ex) {
-            // Handles Duplicate name, etc.
             log.error("Data integrity violation during update: {}", ex.getMessage());
             return new ResponseEntity<>("Update failed: A field violates a unique constraint (e.g., duplicate name).",
-                    HttpStatus.CONFLICT); // Return 409
+                    HttpStatus.CONFLICT);
 
         } catch (Exception ex) {
-            // Handles all other unexpected errors (e.g., file system failure in saveImage)
             log.error("Unexpected failure to update product: {}", ex.getMessage(), ex);
-            // We will return a 400 because the client's request might be malformed,
-            // but the core server issue is logged as an ERROR.
             return new ResponseEntity<>("Update failed due to server processing error.", HttpStatus.BAD_REQUEST);
         }
     }
 
-    /**
-     * Deletes a product from the system.
-     * 
-     * @param id The ID of the product to delete
-     * @return ResponseEntity containing a success message and HTTP status OK if
-     *         successful,
-     *         or an error message and HTTP status NOT_FOUND if the product doesn't
-     *         exist
-     */
     @Override
     @CacheEvict(
         value = {
@@ -198,126 +157,72 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    /**
-     * Retrieves all products from the system.
-     * 
-     * @return ResponseEntity containing a list of ProductResponseDTO and HTTP
-     *         status OK,
-     *         returns an empty list if no products are found
-     */
     @Override
     @Cacheable(cacheNames = CacheNames.PRODUCT_LIST)
     public List<ProductResponseDTO> getAllProducts() {
+        log.debug("Fetching all products from database");
         return productDAO.findAll()
                 .stream()
                 .map(productMapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
-
-    /**
-     * Retrieves a product by its ID.
-     * 
-     * @param id The ID of the product to retrieve
-     * @return ResponseEntity containing the ProductResponseDTO and HTTP status OK
-     *         if found,
-     *         or HTTP status NOT_FOUND if the product doesn't exist
-     */
     @Override
-    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_ID, key = "#id")
+    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_ID, key = "#id", unless = "#result == null")
     public ProductResponseDTO getProductById(Integer id) {
-            ProductResponseDTO productResponseDTO = productMapper.toDto(
-                    productDAO.findById(id)
-                            .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id)));
-            return productResponseDTO;
+        log.debug("Fetching product by id: {}", id);
+        return productMapper.toDto(
+                productDAO.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Product not found with id " + id)));
     }
 
-    /**
-     * Retrieves products by their name.
-     * 
-     * @param name The name of the products to search for
-     * @return ResponseEntity containing a list of matching ProductResponseDTO and
-     *         HTTP status OK,
-     *         returns an empty list if no products are found
-     */
     @Override
-    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_NAME, key = "#name.toLowerCase()")
+    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_NAME, key = "#name.toLowerCase()", unless = "#result.isEmpty()")
     public List<ProductResponseDTO> getProductByName(String name) {
-            List<ProductResponseDTO> products = productDAO.findByName(name)
-                    .stream()
-                    .map(productMapper::toDto)
-                    .collect(Collectors.toList());
-            return products;
+        log.debug("Fetching products by name: {}", name);
+        return productDAO.findByName(name)
+                .stream()
+                .map(productMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Retrieves products by their type.
-     * 
-     * @param type The type of products to retrieve
-     * @return ResponseEntity containing a list of matching ProductResponseDTO and
-     *         HTTP status OK,
-     *         or an empty list and HTTP status INTERNAL_SERVER_ERROR if the
-     *         operation fails
-     */
     @Override
-    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_TYPE, key = "#type.name()")
+    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_TYPE, key = "#type.name()", unless = "#result.isEmpty()")
     public List<ProductResponseDTO> getProductsByType(TypeProduct type) {
-        List<ProductResponseDTO> products = productDAO.findByTypeProduct(type)
+        log.debug("Fetching products by type: {}", type);
+        return productDAO.findByTypeProduct(type)
                 .stream()
                 .map(productMapper::toDto)
                 .collect(Collectors.toList());
-        return products;
     }
 
-    /**
-     * Retrieves products by their category.
-     * 
-     * @param category The category of products to retrieve
-     * @return ResponseEntity containing a list of matching ProductResponseDTO and
-     *         HTTP status OK,
-     *         or an empty list and HTTP status INTERNAL_SERVER_ERROR if the
-     *         operation fails
-     */
     @Override
-    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_CATEGORY, key = "#category.name()")
+    @Cacheable(cacheNames = CacheNames.PRODUCT_BY_CATEGORY, key = "#category.name()", unless = "#result.isEmpty()")
     public List<ProductResponseDTO> getProductsByCategory(Category category) {
-        List<ProductResponseDTO> products = productDAO.findByCategory(category)
+        log.debug("Fetching products by category: {}", category);
+        return productDAO.findByCategory(category)
                 .stream()
                 .map(productMapper::toDto)
                 .collect(Collectors.toList());
-        return products;
     }
 
-    /**
-     * Retrieves all products that are low on stock (quantity <= stock alert
-     * threshold).
-     * 
-     * @return ResponseEntity containing a list of low stock ProductResponseDTO and
-     *         HTTP status OK,
-     *         returns an empty list if no low stock products are found
-     */
     @Override
     @Cacheable(cacheNames = CacheNames.LOW_STOCK)
     public List<ProductResponseDTO> getLowStockProducts() {
-            List<ProductResponseDTO> lowStockProducts = productDAO.findAll()
-                    .stream()
-                    .filter(p -> p.getQuantity() != null && p.getQuantity() <= DEFAULT_STOCK_ALERT_THRESHOLD)
-                    .map(productMapper::toDto)
-                    .collect(Collectors.toList());
+        log.debug("Fetching low stock products from database");
+        List<ProductResponseDTO> lowStockProducts = productDAO.findAll()
+                .stream()
+                .filter(p -> p.getQuantity() != null && p.getQuantity() <= DEFAULT_STOCK_ALERT_THRESHOLD)
+                .map(productMapper::toDto)
+                .collect(Collectors.toList());
 
-            if (!lowStockProducts.isEmpty()) {
-                log.warn("Low stock products: {}", lowStockProducts);
-            }
+        if (!lowStockProducts.isEmpty()) {
+            log.warn("Low stock products found: {}", lowStockProducts.size());
+        }
 
-            return lowStockProducts;
+        return lowStockProducts;
     }
 
-    // Helper method to log low stock for a single product
-    /**
-     * Helper method to check and log if a product is low on stock.
-     * 
-     * @param product The product to check for low stock
-     */
     private void checkAndLogLowStock(Product product) {
         if (product.getQuantity() != null && product.getQuantity() <= product.getStockAlertThreshold()) {
             log.warn("Product '{}' is low on stock! Current quantity: {}", product.getName(), product.getQuantity());
@@ -331,14 +236,6 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    /**
-     * Updates the status of a product based on its current quantity and stock alert
-     * threshold.
-     * Sets status to URGENT if quantity is below or equal to threshold, NON_URGENT
-     * otherwise.
-     * 
-     * @param product The product to update the status for
-     */
     private void updateProductStatus(Product product) {
         if (product.getQuantity() != null && product.getStockAlertThreshold() != null) {
             if (product.getQuantity() <= product.getStockAlertThreshold()) {
@@ -351,13 +248,8 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    /**
-     * Scheduled task that runs every 12 hours to check and update the status of all
-     * products
-     * based on their current stock levels. This method runs asynchronously.
-     */
     @Async
-    @Scheduled(cron = "0 0 */12 * * *") // every 12 hours
+    @Scheduled(cron = "0 0 */12 * * *")
     @CacheEvict(
         value = {
             CacheNames.PRODUCT_BY_ID,
@@ -373,13 +265,12 @@ public class ProductServiceImpl implements ProductService {
         log.info("Running scheduled low stock check...");
 
         var lowStockProducts = productDAO.findAll().stream()
-                .peek(this::updateProductStatus) // update each product's status
-                .map(productDAO::save) // save updated status
+                .peek(this::updateProductStatus)
+                .map(productDAO::save)
                 .filter(p -> p.getQuantity() != null && p.getStockAlertThreshold() != null
                         && p.getQuantity() <= p.getStockAlertThreshold())
-                .toList();
+                .collect(Collectors.toList());
 
-        // If there are low-stock products, send an email alert
         if (!lowStockProducts.isEmpty()) {
             StringBuilder message = new StringBuilder(
                     "Low Stock Alert!\n\nThe following products are below their stock threshold:\n\n");
@@ -397,11 +288,9 @@ public class ProductServiceImpl implements ProductService {
                     "Stock Alert: Low Inventory Detected",
                     message.toString());
 
-            // log.warn("Low stock alert email sent to admin. Products: {}",
-            // lowStockProducts.size());
+            log.warn("Low stock alert email sent. Products affected: {}", lowStockProducts.size());
         }
 
         log.info("Low stock check completed.");
     }
-
 }
