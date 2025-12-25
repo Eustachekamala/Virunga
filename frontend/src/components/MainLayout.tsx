@@ -155,7 +155,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                     <button onClick={() => setSidebarOpen(true)} className="p-2 text-cocoa hover:bg-cocoa/5 rounded-lg">
                         <Menu className="w-6 h-6" />
                     </button>
-                    <span className="font-bold text-lg text-cocoa">Virunga</span>
+                    <span className="font-bold text-lg text-cocoa">Virunga ToolHub</span>
                     <div className="w-10" /> {/* Spacer */}
                 </header>
 
