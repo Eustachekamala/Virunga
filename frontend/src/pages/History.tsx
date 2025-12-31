@@ -23,10 +23,6 @@ const History = () => {
         searchTerm: '',
     });
 
-    useEffect(() => {
-        fetchProducts();
-        fetchMovements();
-    }, []);
 
     const fetchProducts = async () => {
         try {
@@ -44,6 +40,13 @@ const History = () => {
         setMovements(data);
         setLoading(false);
     };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchProducts();
+        fetchMovements();
+    }, []);
+
 
     const handleFilter = () => {
         fetchMovements();
@@ -66,6 +69,7 @@ const History = () => {
 
     const handleExport = () => {
         const filterDescription = Object.entries(filters)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .filter(([_, value]) => value)
             .map(([key, value]) => `${key}: ${value}`)
             .join(', ');

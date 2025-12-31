@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import ProductCard from '../components/ProductCard';
 import ProductModal from '../components/ProductModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
+import { showSuccess } from '../components/ui/Toast';
 import {
     createProduct,
     deleteProduct,
@@ -113,9 +114,11 @@ const Inventory = () => {
     const handleExportPDF = () => {
         if (viewMode === 'LOW_STOCK') {
             generateLowStockInventoryReport(products);
+            showSuccess("Inventory Report Exported downloaded")
         } else {
             // Use category-grouped PDF for all products view
             generateInventoryReport(products);
+            showSuccess("Inventory Report Exported downloaded")
         }
     };
 
