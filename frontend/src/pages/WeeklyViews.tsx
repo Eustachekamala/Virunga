@@ -23,15 +23,24 @@ const WeeklyViews = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchWeeklySummary();
-    }, [selectedDate]);
-
-    const fetchWeeklySummary = () => {
-        setLoading(true);
-        const data = getWeeklySummary(new Date(selectedDate));
-        setSummary(data);
-        setLoading(false);
-    };
+            let isMounted = true;
+    
+            const loadSummary = async () => {
+                setLoading(true);
+                try {
+                    const data = getWeeklySummary(new Date(selectedDate));
+                    if (isMounted) setSummary(data);
+                } finally {
+                    if (isMounted) setLoading(false);
+                }
+            };
+    
+            loadSummary();
+    
+            return () => {
+                isMounted = false;
+            };
+        }, [selectedDate]);
 
     const handleExport = () => {
         if (!summary) return;
@@ -81,7 +90,7 @@ const WeeklyViews = () => {
 
                     <button
                         onClick={handleExport}
-                        disabled={!summary}
+                        disabled={!summary || movements.length === 0}
                         className="w-full sm:w-auto px-6 py-3 bg-cocoa text-gold hover:bg-cocoa/90 rounded-xl font-bold transition-all shadow-lg shadow-cocoa/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95"
                     >
                         <FileDown className="w-5 h-5" />

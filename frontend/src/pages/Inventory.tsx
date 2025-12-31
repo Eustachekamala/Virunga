@@ -20,7 +20,6 @@ import {
     FileDown,
     Search,
     Filter,
-    AlertTriangle,
     PackageOpen
 } from 'lucide-react';
 
@@ -129,11 +128,6 @@ const Inventory = () => {
                         <h2 className="text-3xl md:text-4xl font-bold text-cocoa tracking-tight">
                             {viewMode === 'LOW_STOCK' ? 'Low Stock Alerts' : 'Inventory'}
                         </h2>
-                        {viewMode === 'LOW_STOCK' && (
-                            <div className="bg-red-500 text-white rounded-lg p-1.5 animate-pulse">
-                                <AlertTriangle className="w-5 h-5" />
-                            </div>
-                        )}
                     </div>
                     <p className="text-cocoa/60 font-medium text-sm">
                         Managing <span className="text-cocoa font-bold">{products.length}</span> {products.length === 1 ? 'item' : 'items'} in current view
@@ -154,7 +148,8 @@ const Inventory = () => {
                     {products.length > 0 && (
                         <button
                             onClick={handleExportPDF}
-                            className="flex-1 md:flex-none px-5 py-2.5 bg-white text-cocoa hover:bg-cocoa/5 hover:text-cocoa border border-white/40 rounded-xl font-medium transition-all shadow-lg hover:shadow-xl active:scale-95 flex items-center justify-center gap-2"
+                            disabled={products.length === 0}
+                             className="w-full sm:w-auto px-6 py-3 bg-cocoa text-gold hover:bg-cocoa/90 rounded-xl font-bold transition-all shadow-lg shadow-cocoa/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95"
                         >
                             <FileDown className="w-4 h-4" /> Export
                         </button>

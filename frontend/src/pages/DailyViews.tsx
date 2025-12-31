@@ -19,15 +19,25 @@ const DailyViews = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchDailySummary();
+        let isMounted = true;
+
+        const loadSummary = async () => {
+            setLoading(true);
+            try {
+                const data = getDailySummary(new Date(selectedDate));
+                if (isMounted) setSummary(data);
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+
+        loadSummary();
+
+        return () => {
+            isMounted = false;
+        };
     }, [selectedDate]);
 
-    const fetchDailySummary = () => {
-        setLoading(true);
-        const data = getDailySummary(new Date(selectedDate));
-        setSummary(data);
-        setLoading(false);
-    };
 
     const handleExport = () => {
         if (!summary) return;
