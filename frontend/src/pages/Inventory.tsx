@@ -46,10 +46,7 @@ const Inventory = () => {
             if (viewMode === 'LOW_STOCK') {
                 data = await getLowStockProducts();
             } else if (searchQuery.trim()) {
-                // Search by name
-                const data = await getProductByName(searchQuery.trim());
-                    setProducts(data ?? []);
-
+                data = await getProductByName(searchQuery.trim());
             } else if (selectedType !== 'ALL') {
                 data = await getProductsByType(selectedType);
             } else if (selectedCategory !== 'ALL') {
@@ -57,14 +54,16 @@ const Inventory = () => {
             } else {
                 data = await getProducts();
             }
-            setProducts(data);
+
+            setProducts(data ?? []);
         } catch (error) {
             console.error('Failed to fetch products', error);
-            setProducts([]); // Set empty array on error
+            setProducts([]);
         } finally {
             setLoading(false);
         }
     };
+
 
     // Debounce search
     useEffect(() => {

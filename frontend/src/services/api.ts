@@ -38,7 +38,9 @@ export const getLowStockProducts = async (): Promise<Product[]> => {
 };
 
 export const getProductByName = async (name: string): Promise<Product[]> => {
-    const response = await apiClient.get(`/products/getByName/${name}`);
+    const response = await apiClient.get(
+    `/products/getByName/${encodeURIComponent(name)}`
+    );
     return response.data;
 };
 
